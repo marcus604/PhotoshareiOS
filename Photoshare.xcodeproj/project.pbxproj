@@ -15,6 +15,7 @@
 		2C6526A2212607A7006EF3BA /* Socket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C6526A1212607A7006EF3BA /* Socket.framework */; };
 		2C6526A6212607DD006EF3BA /* Socket.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C6526A5212607DD006EF3BA /* Socket.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2C6526AA212608EA006EF3BA /* SSLService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6526A9212608EA006EF3BA /* SSLService.swift */; };
+		2C6526AE21260B54006EF3BA /* ConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6526AD21260B54006EF3BA /* ConnectionManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -41,6 +42,7 @@
 		2C6526A1212607A7006EF3BA /* Socket.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Socket.framework; path = Carthage/Build/iOS/Socket.framework; sourceTree = "<group>"; };
 		2C6526A5212607DD006EF3BA /* Socket.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Socket.framework; path = Carthage/Build/iOS/Socket.framework; sourceTree = "<group>"; };
 		2C6526A9212608EA006EF3BA /* SSLService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSLService.swift; sourceTree = "<group>"; };
+		2C6526AD21260B54006EF3BA /* ConnectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,6 +80,7 @@
 			children = (
 				2C65269F212605AB006EF3BA /* Supporting Files */,
 				2C65268F21260575006EF3BA /* ViewController.swift */,
+				2C6526AD21260B54006EF3BA /* ConnectionManager.swift */,
 				2C65269121260575006EF3BA /* Main.storyboard */,
 				2C65269921260576006EF3BA /* Info.plist */,
 			);
@@ -194,6 +197,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2C65269021260575006EF3BA /* ViewController.swift in Sources */,
+				2C6526AE21260B54006EF3BA /* ConnectionManager.swift in Sources */,
 				2C65268E21260575006EF3BA /* AppDelegate.swift in Sources */,
 				2C6526AA212608EA006EF3BA /* SSLService.swift in Sources */,
 			);

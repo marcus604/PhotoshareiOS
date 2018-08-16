@@ -7,13 +7,20 @@
 //
 
 import UIKit
-import Socket
+
 
 
 class ViewController: UIViewController {
 
     
-
+    @IBAction func connectButton(_ sender: UIButton) {
+        let connectionManager = ConnectionManager(
+            ipAddress: "youwontbelieveme.duckdns.org",
+            serverPort: 1428
+        )
+        connectionManager.connect()
+    }
+    
 
 }
 
