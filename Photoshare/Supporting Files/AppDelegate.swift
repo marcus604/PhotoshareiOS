@@ -16,6 +16,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        //Checks if app has launched before
+        //Could look at switching this to store in core data rather than Userdefaults
+        self.window = UIWindow(frame: UIScreen.main.bounds)
+        
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        var storyboardID = ""
+        
+        let launchedBefore = UserDefaults.standard.bool(forKey: "launchedBefore")
+        if launchedBefore  {
+            storyboardID = "ViewController"
+        } else {
+            UserDefaults.standard.set(true, forKey: "launchedBefore")
+            storyboardID = "WelcomeViewController"
+        }
+        
+        let initialViewController = storyboard.instantiateViewController(withIdentifier: storyboardID)
+        
+        self.window?.rootViewController = initialViewController
+        self.window?.makeKeyAndVisible()
+
+        
         return true
     }
 

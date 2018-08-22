@@ -15,7 +15,10 @@
 		2C6526A2212607A7006EF3BA /* Socket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C6526A1212607A7006EF3BA /* Socket.framework */; };
 		2C6526A6212607DD006EF3BA /* Socket.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C6526A5212607DD006EF3BA /* Socket.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2C6526AA212608EA006EF3BA /* SSLService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6526A9212608EA006EF3BA /* SSLService.swift */; };
-		2C6526AE21260B54006EF3BA /* ConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6526AD21260B54006EF3BA /* ConnectionManager.swift */; };
+		2C6526AE21260B54006EF3BA /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6526AD21260B54006EF3BA /* Connection.swift */; };
+		2C6526B021261502006EF3BA /* Photoshare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6526AF21261502006EF3BA /* Photoshare.swift */; };
+		2C6526B22126150C006EF3BA /* PSMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6526B12126150C006EF3BA /* PSMessage.swift */; };
+		2C72637E212D36300017409F /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C72637D212D36300017409F /* WelcomeViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -42,7 +45,10 @@
 		2C6526A1212607A7006EF3BA /* Socket.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Socket.framework; path = Carthage/Build/iOS/Socket.framework; sourceTree = "<group>"; };
 		2C6526A5212607DD006EF3BA /* Socket.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Socket.framework; path = Carthage/Build/iOS/Socket.framework; sourceTree = "<group>"; };
 		2C6526A9212608EA006EF3BA /* SSLService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSLService.swift; sourceTree = "<group>"; };
-		2C6526AD21260B54006EF3BA /* ConnectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionManager.swift; sourceTree = "<group>"; };
+		2C6526AD21260B54006EF3BA /* Connection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connection.swift; sourceTree = "<group>"; };
+		2C6526AF21261502006EF3BA /* Photoshare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photoshare.swift; sourceTree = "<group>"; };
+		2C6526B12126150C006EF3BA /* PSMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PSMessage.swift; sourceTree = "<group>"; };
+		2C72637D212D36300017409F /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,8 +86,11 @@
 			children = (
 				2C65269F212605AB006EF3BA /* Supporting Files */,
 				2C65268F21260575006EF3BA /* ViewController.swift */,
-				2C6526AD21260B54006EF3BA /* ConnectionManager.swift */,
+				2C6526AF21261502006EF3BA /* Photoshare.swift */,
+				2C6526B12126150C006EF3BA /* PSMessage.swift */,
+				2C6526AD21260B54006EF3BA /* Connection.swift */,
 				2C65269121260575006EF3BA /* Main.storyboard */,
+				2C72637D212D36300017409F /* WelcomeViewController.swift */,
 				2C65269921260576006EF3BA /* Info.plist */,
 			);
 			path = Photoshare;
@@ -196,10 +205,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2C6526B22126150C006EF3BA /* PSMessage.swift in Sources */,
 				2C65269021260575006EF3BA /* ViewController.swift in Sources */,
-				2C6526AE21260B54006EF3BA /* ConnectionManager.swift in Sources */,
+				2C6526AE21260B54006EF3BA /* Connection.swift in Sources */,
 				2C65268E21260575006EF3BA /* AppDelegate.swift in Sources */,
 				2C6526AA212608EA006EF3BA /* SSLService.swift in Sources */,
+				2C6526B021261502006EF3BA /* Photoshare.swift in Sources */,
+				2C72637E212D36300017409F /* WelcomeViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
