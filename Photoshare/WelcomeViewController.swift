@@ -15,17 +15,27 @@ class WelcomeViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
     }
-    @IBAction func connectButton(_ sender: UIButton) {
-        do {
-            let connection = try Connection(
-                hostName: "10.10.1.67",
-                port: 1428
-            )
-            connection.start()
-            sleep(4)
-        } catch {
-            print("failed")
+    
+    private var photoshare = Photoshare()
+    
+    
+    @IBAction func hostNameFieldDidChange(_ sender: UITextField) {
+        print("host changed")
+        if let text = sender.text {
+            photoshare.set(hostName: text)
         }
+        
+    }
+    
+    //Updates port, checks if empty and converts to int
+    @IBAction func portFieldDidChange(_ sender: UITextField) {
+        print("port changed")
+        if let text = sender.text {
+            photoshare.set(port: text)
+        }
+    }
+    @IBAction func connectButton(_ sender: UIButton) {
+        
     }
     
 }
