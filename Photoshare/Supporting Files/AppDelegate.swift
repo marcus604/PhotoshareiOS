@@ -26,6 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let launchedBefore = UserDefaults.standard.bool(forKey: "launchedBefore")
         if launchedBefore  {
             storyboardID = "ViewController"
+            storyboardID = "WelcomeViewController"  //Force it to go to welcome screen // REMOVE
         } else {
             UserDefaults.standard.set(true, forKey: "launchedBefore")
             storyboardID = "WelcomeViewController"
