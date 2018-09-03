@@ -70,7 +70,7 @@ public class SSLService: SSLServiceDelegate {
 			errSecAuthFailed    	 : "errSecAuthFailed",
 			errSSLClosedGraceful	 : "errSSLClosedGraceful",
 			errSSLXCertChainInvalid	 : "errSSLXCertChainInvalid",
-			errSSLPeerAuthCompleted: "errSSLPeerAuthCompleted"
+			errSSLPeerAuthCompleted  : "errSSLPeerAuthCompleted"
 		]
 	
 	#endif
@@ -1274,7 +1274,6 @@ public class SSLService: SSLServiceDelegate {
 				}
 			
 			#else
-			
 				// @FIXME: No standard verification on macOS yet...
 			
 			#endif
