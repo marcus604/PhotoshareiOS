@@ -34,6 +34,16 @@ class WelcomeViewController: UIViewController {
             photoshare.set(port: text)
         }
     }
+    
+    @IBAction func allowSelfSignedCertSwitch(_ sender: UISwitch) {
+
+        if sender.isOn {
+            photoshare.set(allowSelfSignedCerts: true)
+        } else {
+            photoshare.set(allowSelfSignedCerts: false)
+        }
+    }
+    
     @IBAction func connectButton(_ sender: UIButton) {
         
     }

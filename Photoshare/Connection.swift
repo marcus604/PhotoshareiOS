@@ -16,16 +16,18 @@ class Connection {
     
     
     private let bufferSize = 16384
-    private var hostName = "10.10.1.67"
-    private var port = 1428
     private let timeout = 5000
-    private var socket: Socket
-    //private var sslConfiguration: SSLService.Configuration
     
-    init(hostName: String, port: Int) throws {
+    private var hostName: String?
+    private var port: Int?
+    private let allowSelfSignedCerts: Bool?
+    private var socket: Socket
+    
+    
+    init(hostName: String, port: Int, allowSelfSignedCerts: Bool) throws {
         self.hostName = hostName
         self.port = port
-        
+        self.allowSelfSignedCerts = allowSelfSignedCerts
         
         socket = try Socket.create(family: .inet, type: .stream, proto: .tcp)
         socket.readBufferSize = bufferSize
@@ -35,7 +37,7 @@ class Connection {
     public func start() {
         
         //Allows self signed certificates
-        var sslConfiguration = SSLService.Configuration(withCipherSuite: nil, clientAllowsSelfSignedCertificates: true)
+        var sslConfiguration = SSLService.Configuration(withCipherSuite: nil, clientAllowsSelfSignedCertificates: allowSelfSignedCerts!)
         sslConfiguration.cipherSuite = "ALL"
         
        
@@ -44,23 +46,32 @@ class Connection {
             socket.delegate = sslService
             sslService?.verifyCallback = { _ in
                 return (true, nil)
-                
             }
             
-            usleep(10000)
+            
             let timeout = UInt(max(0, self.timeout))
-            try socket.connect(to: hostName, port: Int32(port), timeout: timeout)
+            try socket.connect(to: hostName!, port: Int32(port!), timeout: timeout)
             
+            if socket.remoteHostname != hostName {
+                print("man in the middle")
+            }
+            print("wait")
             
+            try socket.write(from: "b010007andy:hi")
+            print("wait")
             
 //            sleep(4)
-//            try socket.write(from: "b010007andy:hi")
+//
             
             
         } catch {
             print("hi")
         }
         
+    }
+    
+    public func disconnect() {
+        socket.close()
     }
     
     
