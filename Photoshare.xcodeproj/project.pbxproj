@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2C11B770213E5BE600C6A374 /* SwiftKeychainWrapper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C11B76F213E5BE600C6A374 /* SwiftKeychainWrapper.framework */; };
+		2C11B772213E5BFE00C6A374 /* SwiftKeychainWrapper.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C11B771213E5BFE00C6A374 /* SwiftKeychainWrapper.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2C65268E21260575006EF3BA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C65268D21260575006EF3BA /* AppDelegate.swift */; };
 		2C65269021260575006EF3BA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C65268F21260575006EF3BA /* ViewController.swift */; };
 		2C65269321260575006EF3BA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C65269121260575006EF3BA /* Main.storyboard */; };
@@ -29,12 +31,15 @@
 			dstSubfolderSpec = 10;
 			files = (
 				2C6526A6212607DD006EF3BA /* Socket.framework in CopyFiles */,
+				2C11B772213E5BFE00C6A374 /* SwiftKeychainWrapper.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2C11B76F213E5BE600C6A374 /* SwiftKeychainWrapper.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftKeychainWrapper.framework; path = Carthage/Build/iOS/SwiftKeychainWrapper.framework; sourceTree = "<group>"; };
+		2C11B771213E5BFE00C6A374 /* SwiftKeychainWrapper.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftKeychainWrapper.framework; path = Carthage/Build/iOS/SwiftKeychainWrapper.framework; sourceTree = "<group>"; };
 		2C65268A21260575006EF3BA /* Photoshare.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Photoshare.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C65268D21260575006EF3BA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2C65268F21260575006EF3BA /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -48,6 +53,8 @@
 		2C6526AD21260B54006EF3BA /* Connection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connection.swift; sourceTree = "<group>"; };
 		2C6526AF21261502006EF3BA /* Photoshare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photoshare.swift; sourceTree = "<group>"; };
 		2C6526B12126150C006EF3BA /* PSMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PSMessage.swift; sourceTree = "<group>"; };
+		2C6DE6E8213D0DA000C9E440 /* Locksmith.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Locksmith.framework; path = Carthage/Build/iOS/Locksmith.framework; sourceTree = "<group>"; };
+		2C6DE6EC213D0DE300C9E440 /* Photoshare.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Photoshare.entitlements; sourceTree = "<group>"; };
 		2C72637D212D36300017409F /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -57,6 +64,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2C6526A2212607A7006EF3BA /* Socket.framework in Frameworks */,
+				2C11B770213E5BE600C6A374 /* SwiftKeychainWrapper.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -66,6 +74,7 @@
 		2C65268121260575006EF3BA = {
 			isa = PBXGroup;
 			children = (
+				2C11B771213E5BFE00C6A374 /* SwiftKeychainWrapper.framework */,
 				2C6526A5212607DD006EF3BA /* Socket.framework */,
 				2C65268C21260575006EF3BA /* Photoshare */,
 				2C65268B21260575006EF3BA /* Products */,
@@ -84,6 +93,7 @@
 		2C65268C21260575006EF3BA /* Photoshare */ = {
 			isa = PBXGroup;
 			children = (
+				2C6DE6EC213D0DE300C9E440 /* Photoshare.entitlements */,
 				2C65269F212605AB006EF3BA /* Supporting Files */,
 				2C65268F21260575006EF3BA /* ViewController.swift */,
 				2C6526AF21261502006EF3BA /* Photoshare.swift */,
@@ -110,6 +120,8 @@
 		2C6526A0212607A7006EF3BA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2C11B76F213E5BE600C6A374 /* SwiftKeychainWrapper.framework */,
+				2C6DE6E8213D0DA000C9E440 /* Locksmith.framework */,
 				2C6526A1212607A7006EF3BA /* Socket.framework */,
 			);
 			name = Frameworks;
@@ -149,6 +161,11 @@
 				TargetAttributes = {
 					2C65268921260575006EF3BA = {
 						CreatedOnToolsVersion = 9.4.1;
+						SystemCapabilities = {
+							com.apple.Keychain = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -191,6 +208,7 @@
 			);
 			inputPaths = (
 				"$(SRCROOT)/Carthage/Build/iOS/Socket.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/SwiftKeychainWrapper.framework",
 			);
 			outputPaths = (
 			);
@@ -355,6 +373,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Photoshare/Photoshare.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 6X5H2JMEXK;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -377,6 +396,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Photoshare/Photoshare.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 6X5H2JMEXK;
 				FRAMEWORK_SEARCH_PATHS = (

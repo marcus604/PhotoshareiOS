@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftKeychainWrapper
 
 
 class Photoshare {
@@ -50,6 +51,22 @@ class Photoshare {
         
     }
     
+    
+    
+    //Set settings
+    //If newSetting != previousSetting
+    //  Create new connection
+    //else
+    //  do nothing
+    public func set(userName: String){
+        UserDefaults.standard.set(userName, forKey: "userName")
+    }
+    
+    
+    private func get(userName: String) -> String{
+        return UserDefaults.standard.string(forKey: "userName")!
+    }
+    
     public func set(hostName: String){
         UserDefaults.standard.set(hostName, forKey: "hostName")
     }
@@ -76,6 +93,14 @@ class Photoshare {
     
     private func getAllowSelfSignedCerts(){
         allowSelfSignedCerts = UserDefaults.standard.bool(forKey: "allowSelfSignedCerts")
+    }
+    
+    public func set(password: String){
+        KeychainWrapper.standard.set(password, forKey: "userPassword")
+    }
+    
+    private func get(password: String) -> String{
+        return KeychainWrapper.standard.string(forKey: "userPassword")!
     }
     
     private func receive(message msg: PSMessage){
