@@ -13,45 +13,61 @@ import SwiftKeychainWrapper
 class Photoshare {
     
     private var connection: Connection?
-    private var serverHostName: String?
-    private var allowSelfSignedCerts = true
-    private var port: Int?
     
     init() {
         //Do I have settings required to initiate a connection
-        set(hostName: "youwontbelieveme.duckdns.org")
-        set(port: "1428")
-        set(allowSelfSignedCerts: true)
-        getHostName()
-        getPort()
-        getAllowSelfSignedCerts()
-        if let serverHostName = serverHostName, let port = port{
-            connection = connect()
-        } else {
-            print("No server hostname and/or port")
+        //Make the initial TCP and TLS handshake
+        do {
+            try connection = connect()
+            try connection!.handshake()
+            try connection!.run()
+        } catch PhotoshareError.failedConnection{   //TCP|TLS Connection Failed
+            print("TCP/TLS Connection Failed")
+            //Need to display message to user that connection failed and return them to settings
+            //Should highlight hostname and port number
+        } catch PhotoshareError.failedUserAuthentication{ //Inc
+            print("failed user auth")
+            //should highlight username and password
+        } catch PhotoshareError.lostConnection{
+            print("Lost Connection")
+        } catch {
+            print("unknown error")
         }
-        
         
     }
     
-    private func connect() -> Connection {
-        
+    public func connect() throws -> Connection {
+        set(hostName: "youwontbelieveme.duckdns.org")
+        set(port: "1428")
+        set(allowSelfSignedCerts: true)
+        set(compressionLevel: 0.0)
+        set(userName: "andy")
+        set(password: "hi")
         do {
             connection = try Connection(
-                hostName: serverHostName!,
-                port: port!,
-                allowSelfSignedCerts: allowSelfSignedCerts)
-            connection?.start()
-            sleep(4)
+                hostName: getHostName(),
+                port: getPort(),
+                allowSelfSignedCerts: getAllowSelfSignedCerts(),
+                compressionLevel: getCompressionLevel(),
+                userName: getUserName(),
+                password: getPassword()
+                )
+            connection!.start()
+            
             
         } catch {
-            
+            print(error)
+            throw PhotoshareError.failedConnection
         }
         return connection!
         
     }
     
-    
+    enum PhotoshareError: Error {
+        case failedConnection
+        case failedUserAuthentication
+        case lostConnection
+    }
     
     //Set settings
     //If newSetting != previousSetting
@@ -63,10 +79,18 @@ class Photoshare {
     }
     
     
-    private func get(userName: String) -> String{
+    private func getUserName() -> String{
         return UserDefaults.standard.string(forKey: "userName")!
     }
     
+    public func set(compressionLevel: Float){
+        let roundedLevel = Int(round(compressionLevel))
+        UserDefaults.standard.set(roundedLevel, forKey: "compressionLevel")
+    }
+    
+    private func getCompressionLevel() -> Int{
+        return UserDefaults.standard.integer(forKey: "compressionLevel")
+    }
     public func set(hostName: String){
         UserDefaults.standard.set(hostName, forKey: "hostName")
     }
@@ -83,23 +107,23 @@ class Photoshare {
         UserDefaults.standard.set(value, forKey: setting)
     }
     
-    private func getHostName(){
-       serverHostName = UserDefaults.standard.string(forKey: "hostName")
+    private func getHostName() -> String{
+        return UserDefaults.standard.string(forKey: "hostName")!
     }
     
-    private func getPort(){
-        port = UserDefaults.standard.integer(forKey: "port")
+    private func getPort() -> Int{
+        return UserDefaults.standard.integer(forKey: "port")
     }
     
-    private func getAllowSelfSignedCerts(){
-        allowSelfSignedCerts = UserDefaults.standard.bool(forKey: "allowSelfSignedCerts")
+    private func getAllowSelfSignedCerts() -> Bool{
+        return UserDefaults.standard.bool(forKey: "allowSelfSignedCerts")
     }
     
     public func set(password: String){
         KeychainWrapper.standard.set(password, forKey: "userPassword")
     }
     
-    private func get(password: String) -> String{
+    private func getPassword() -> String{
         return KeychainWrapper.standard.string(forKey: "userPassword")!
     }
     
