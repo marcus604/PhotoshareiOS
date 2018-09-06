@@ -66,18 +66,12 @@
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" keyboardType="URL"/>
-                                <connections>
-                                    <action selector="hostNameFieldDidChange:" destination="Dhc-xi-3By" eventType="editingDidEnd" id="7PN-Qm-HuR"/>
-                                </connections>
                             </textField>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Qku-Oj-E54">
                                 <rect key="frame" x="262" y="232" width="97" height="30"/>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
-                                <connections>
-                                    <action selector="portFieldDidChange:" destination="Dhc-xi-3By" eventType="editingDidEnd" id="JjN-XO-SE0"/>
-                                </connections>
                             </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hostname" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TdX-dB-xK7">
                                 <rect key="frame" x="16" y="167" width="79" height="21"/>
@@ -134,6 +128,27 @@
                                     <action selector="allowSelfSignedCertSwitch:" destination="Dhc-xi-3By" eventType="valueChanged" id="vhi-IF-cRQ"/>
                                 </connections>
                             </switch>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Compression Level" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SYk-ZR-HCu">
+                                <rect key="frame" x="16" y="524" width="145" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="3" translatesAutoresizingMaskIntoConstraints="NO" id="pPP-1C-rBz">
+                                <rect key="frame" x="243" y="519" width="118" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <connections>
+                                    <action selector="compressionSliderChanged:" destination="Dhc-xi-3By" eventType="valueChanged" id="LN1-5b-zG7"/>
+                                </connections>
+                            </slider>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="None" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yNa-7k-5Je">
+                                <rect key="frame" x="273" y="556" width="75" height="31"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -170,6 +185,8 @@
                     </view>
                     <connections>
                         <outlet property="allowSelfSignedCertSwich" destination="OBx-uX-6Yu" id="PX5-cr-exJ"/>
+                        <outlet property="compressionSlider" destination="pPP-1C-rBz" id="tXr-pg-h7b"/>
+                        <outlet property="compressionText" destination="yNa-7k-5Je" id="As1-wy-nXL"/>
                         <outlet property="hostNameTextField" destination="hFj-Jp-pRH" id="X1g-Rj-h7a"/>
                         <outlet property="passwordTextField" destination="rza-bp-QoM" id="lMq-mi-IBI"/>
                         <outlet property="portTextField" destination="Qku-Oj-E54" id="DYa-5x-QMi"/>

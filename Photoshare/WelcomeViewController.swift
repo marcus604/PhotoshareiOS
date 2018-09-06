@@ -8,15 +8,17 @@
 
 import UIKit
 
-
 class WelcomeViewController: UIViewController {
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = .white 
     }
     
     private var photoshare = Photoshare()
+    let compressionLevels = [String](arrayLiteral: "None", "Low", "Medium", "High")
     
     @IBOutlet var settingFields: [UITextField]!
     @IBOutlet weak var hostNameTextField: UITextField!
@@ -24,31 +26,15 @@ class WelcomeViewController: UIViewController {
     @IBOutlet weak var allowSelfSignedCertSwich: UISwitch!
     @IBOutlet weak var userNameTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
+    @IBOutlet weak var compressionText: UILabel!
+    @IBOutlet weak var compressionSlider: UISlider!
     
     
-    @IBAction func hostNameFieldDidChange(_ sender: UITextField) {
-        print("host changed")
-        if let text = sender.text {
-            photoshare.set(hostName: text)
-        }
-        
-    }
-    
-    //Updates port, checks if empty and converts to int
-    @IBAction func portFieldDidChange(_ sender: UITextField) {
-        print("port changed")
-        if let text = sender.text {
-            photoshare.set(port: text)
-        }
-    }
-    
-    @IBAction func allowSelfSignedCertSwitch(_ sender: UISwitch) {
-
-        if sender.isOn {
-            photoshare.set(allowSelfSignedCerts: true)
-        } else {
-            photoshare.set(allowSelfSignedCerts: false)
-        }
+    //Updates label
+    //Look at updating this slider so it snaps into place
+    @IBAction func compressionSliderChanged(_ sender: UISlider) {
+        let level = Int(round(sender.value))
+        compressionText.text = compressionLevels[level]
     }
     
     //Verifies that textfield has text in it, if not sets border to red
@@ -86,8 +72,12 @@ class WelcomeViewController: UIViewController {
             }
         }
         
-        if fieldsValid {
+        //DEBUGGING, so I dont have to fill in fields
+        if !fieldsValid {
             //need to set the self signed certs
+            photoshare.set(compressionLevel: compressionSlider.value)
+            photoshare.set(allowSelfSignedCerts: allowSelfSignedCertSwich.isOn)
+            
             
             print("ready to go")
         }
