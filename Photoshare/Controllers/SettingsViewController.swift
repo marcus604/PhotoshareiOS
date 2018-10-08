@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import Photos
 
 
 class SettingsViewController: UITableViewController {
@@ -29,6 +30,14 @@ class SettingsViewController: UITableViewController {
     //Storage
     @IBOutlet weak var compressionSwitch: UISwitch!
     
+    var imagePicker = UIImagePickerController()
+    
+    @IBAction func importButton(_ sender: UIButton) {
+        imagePicker.sourceType = .photoLibrary
+        imagePicker.allowsEditing = false
+        present(imagePicker, animated: true, completion: nil)
+        
+    }
     
     @IBAction func connectButton(_ sender: UIButton) {
         var fieldsValid = true
@@ -86,7 +95,7 @@ class SettingsViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         let settings = Photoshare.shared().getSettings()
-            
+        imagePicker.delegate = self
             
         if Photoshare.shared().settingsValid(with: settings) {
             hostnameTextField.insertText(settings["hostName"] as! String)
@@ -121,4 +130,29 @@ extension SettingsViewController: UITextFieldDelegate {
         return true
     }
     
+}
+
+extension SettingsViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+   
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        if let imageURL = info[UIImagePickerControllerImageURL] as? URL {
+            print("ok")
+            
+            //print(asset?.value(forKey: "filename"))
+        }
+        var asset: PHAsset?
+        //asset = info[.phAsset] as? PHAsset
+        
+        if let imagerefurl = info[UIImagePickerControllerReferenceURL] as? URL {
+            print("ok")
+        }
+        if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
+            //img.image = image
+            
+            print("got image")
+        }
+        
+        dismiss(animated: true, completion: nil)
+    }
 }
