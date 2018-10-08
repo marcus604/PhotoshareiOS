@@ -16,6 +16,7 @@ struct PSMessage{
     private var length: Int
     private var data: String
     
+    //Default values
     init(endian: String, version: Int, instruction: Int, length: Int, data: String){
         self.endian = endian
         self.version = version
@@ -24,6 +25,16 @@ struct PSMessage{
         self.data = data
     }
     
+    //Request # of Photos
+    init(endian: String, version: Int, instruction: Int, data: String, token: String){
+        self.endian = endian
+        self.version = version
+        self.instruction = instruction
+        self.data = token + data
+        self.length = self.data.count
+    }
+    
+    //Create when received raw string from socket
     init(fromString string: String){
         endian = string[0..<1]
         version = Int(string[1..<3])!
@@ -31,6 +42,8 @@ struct PSMessage{
         length = Int(string[5..<7])!
         data = string[7..<string.count]
     }
+    
+    
     
     public func getString() -> String{
         
