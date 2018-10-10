@@ -19,7 +19,7 @@ class NetworkConnection {
     
     
     private let bufferSize = 16384
-    private let timeout = 1000
+    private let timeout = 10000
     
     private var hostName: String?
     private var port: Int?

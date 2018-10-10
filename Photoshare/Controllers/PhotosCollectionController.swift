@@ -195,6 +195,9 @@ extension PhotosCollectionController {
         cell.imageView.image = photo.localPhoto
         
         let loadFullSizeWorkItem = DispatchWorkItem {
+            if !Photoshare.shared().isConnected {
+                Photoshare.shared().start()
+            }
             photo.loadfullSizePhoto { loadedPhoto, error in
                 
                 guard loadedPhoto.fullSizePhoto != nil && error == nil else {
