@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftKeychainWrapper
+import Photos
 
 
 class Photoshare {
@@ -16,6 +17,7 @@ class Photoshare {
     private var changedPhotos: [String]? //Need to create a class/struct for photo class
     private var photoLibrary: [String]?
     
+    public var isConnected = false
     public var status: String
     
     
@@ -50,8 +52,7 @@ class Photoshare {
             try connection = connect()
             status = "Authenticating"
             try connection?.handshake()
-            status = "Syncing"
-            try connection?.sync(compressionEnabled: getUserSetting(asBoolFor: "compressionEnabled"))
+            isConnected = true
         } catch PhotoshareError.failedConnection{
             status = "TCP/TLS Connection Failed"
             connection?.stop()
@@ -73,6 +74,18 @@ class Photoshare {
     
     }
     
+    public func sync() {
+        if isConnected {
+            status = "Syncing"
+            do {
+                try connection?.sync(compressionEnabled: getUserSetting(asBoolFor: "compressionEnabled"))
+            } catch {
+                print("Failed to Sync")
+            }
+        }
+        
+        
+    }
     public func getFullSizeImage(forPhoto photo: PSPhoto) {
         if !getUserSetting(asBoolFor: "compressionEnabled") {
             photo.fullSizePhoto = nil
@@ -87,6 +100,61 @@ class Photoshare {
         } catch {
             photo.fullSizePhoto = nil
         }
+        
+    }
+    
+    public func sendPhoto(asset: PHAsset) {
+        var rawData = Data()
+        
+        let timeStamp = DateFormatter.localizedString(from: asset.creationDate!, dateStyle: DateFormatter.Style.short, timeStyle: DateFormatter.Style.short)
+        var name = asset.originalFilename
+        var imageSize = Int()
+        let manager = PHImageManager.default()
+        let requestOptions = PHImageRequestOptions()
+        requestOptions.resizeMode = .exact
+        requestOptions.deliveryMode = .highQualityFormat;
+        requestOptions.isNetworkAccessAllowed = true
+        requestOptions.isSynchronous = true
+        
+        let nameComponents = name?.components(separatedBy: ".")
+        let fileExtension = nameComponents![1].uppercased()
+        
+        if fileExtension == "HEIC" || fileExtension == "PNG"{
+            manager.requestImage(for: asset, targetSize: PHImageManagerMaximumSize, contentMode: PHImageContentMode.default, options: requestOptions, resultHandler: {
+                (image, info) in
+                rawData = image!.jpegData(compressionQuality: 0.9)!
+                name = nameComponents![0] + ".jpg"
+                
+                })
+            
+        } else {
+            manager.requestImageData(for: asset, options: requestOptions, resultHandler: { (data, str, orientation, info) in
+                rawData = data!
+            })
+            
+        }
+        
+        imageSize = rawData.count
+        
+        status = "Uploading Photo"
+        guard let connected = connection?.isConnected() else {
+            self.start()
+            return
+        }
+        let result = connection?.sendPhoto(fileName: name!, timeStamp: timeStamp, data: rawData)
+        
+        switch result {
+        case 0: //Could optimizie this as its throwing away the data and then requesting it
+            status = "Imported Photo"
+        case 1:
+            status = "Duplicate Photo"
+        case 2:
+            status = "Unsupported File"
+        default:
+            status = "Unknown Error"
+            
+        }
+        
         
     }
     

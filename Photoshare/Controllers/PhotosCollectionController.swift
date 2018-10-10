@@ -56,6 +56,9 @@ class PhotosCollectionController: UICollectionViewController {
         if Photoshare.shared().settingsValid(with: settings) {
             DispatchQueue.global(qos: .userInitiated).async {
                 Photoshare.shared().start()
+                if Photoshare.shared().isConnected {
+                    Photoshare.shared().sync()
+                }
             }
         }
     }

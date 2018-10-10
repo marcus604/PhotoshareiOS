@@ -19,7 +19,7 @@ class NetworkConnection {
     
     
     private let bufferSize = 16384
-    private let timeout = 0
+    private let timeout = 1000
     
     private var hostName: String?
     private var port: Int?
@@ -115,6 +115,30 @@ class NetworkConnection {
         return image
     }
     
+    public func sendPhoto(fileName name: String, timeStamp: String, data: Data) -> Int {
+        
+        let sendPhotoMsg = PSMessage(endian: endian, version: version, instruction: 20, data: name, token: token)
+        let timeStampMsg = PSMessage(endian: endian, version: version, instruction: 20, data: timeStamp, token: token)
+        var result = Int()
+        do {
+            try send(msg: sendPhotoMsg)
+            try send(msg: timeStampMsg)
+            let imageSize = data.count
+            let imageSizeMsg = PSMessage(endian: endian, version: version, instruction: 21, data: "\(imageSize)", token: token)
+            try send(msg: imageSizeMsg)
+            try socket.write(from: data)
+            try socket.setReadTimeout(value: 20000)     //Gives 20 seconds to send entire photo
+            let importResultMsg = try receiveMessage()
+            try socket.setReadTimeout(value: 1000)
+            result = Int(importResultMsg.getData()) ?? 3  //If cant get error code send generic 3
+        } catch {
+            result = 3
+        }
+        return result
+    
+        
+    }
+    
     public func stop() {
         connected = false
         socket.close()
@@ -155,30 +179,32 @@ class NetworkConnection {
                 
                 let image = try receiveImage(ofSize: sizeOfPhoto!)
                 
-                //let fullPath = getDocumentsDirectory().appendingPathComponent(photoName)
                 let fullPath = getDirectory(withName: "Library/Photos").appendingPathComponent(photoName)
-                //let thumbnailPath = getDocumentsDirectory().appendingPathComponent(<#T##pathComponent: String##String#>, isDirectory: <#T##Bool#>)
+
                 let size = image.count
                 do {
                     try image.write(to: fullPath)
                     var imageUIImage = UIImage(data: image)
                     let fullPath = getDirectory(withName: "Library/Thumbnails").appendingPathComponent(photoName)
                     imageUIImage = resizeImage(image: imageUIImage!, newWidth: 200)
-                    if let data = UIImageJPEGRepresentation(imageUIImage!, 1) {
+                    if let data = imageUIImage!.jpegData(compressionQuality: 1) {
                         try? data.write(to: fullPath)
                     }
-                    let appDelegate = UIApplication.shared.delegate as! AppDelegate
-                    let context = appDelegate.persistentContainer.viewContext
-                    let entity = NSEntityDescription.entity(forEntityName: "Photos", in: context)
-                    let newPhoto = NSManagedObject(entity: entity!, insertInto: context)
-                    newPhoto.setValue(photoName, forKey: "fileName")
-                    newPhoto.setValue(hashOfPhoto, forKey: "photohash")
-                    newPhoto.setValue(timeStampOfPhoto, forKey: "timestamp")
-                    do {
-                        try context.save()
-                    } catch {
-                        print("Failed saving")
+                    DispatchQueue.main.async {
+                        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                        let context = appDelegate.persistentContainer.viewContext
+                        let entity = NSEntityDescription.entity(forEntityName: "Photos", in: context)
+                        let newPhoto = NSManagedObject(entity: entity!, insertInto: context)
+                        newPhoto.setValue(photoName, forKey: "fileName")
+                        newPhoto.setValue(hashOfPhoto, forKey: "photohash")
+                        newPhoto.setValue(timeStampOfPhoto, forKey: "timestamp")
+                        do {
+                            try context.save()
+                        } catch {
+                            print("Failed saving")
+                        }
                     }
+                    
                 } catch {
                     print("Couldn't write file")
                 }
@@ -299,7 +325,13 @@ class NetworkConnection {
     }
     
     
-    
+    func convert(cmage:CIImage) -> UIImage
+    {
+        let context:CIContext = CIContext.init(options: nil)
+        let cgImage:CGImage = context.createCGImage(cmage, from: cmage.extent)!
+        let image:UIImage = UIImage.init(cgImage: cgImage)
+        return image
+    }
    
     
 }
