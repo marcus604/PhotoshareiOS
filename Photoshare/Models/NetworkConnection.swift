@@ -103,8 +103,7 @@ class NetworkConnection {
                 try send(msg: requestImgMsg)
                 
                 let sizeOfPhotoMsg = try receiveMessage()
-                let sizeOfPhoto = Int(sizeOfPhotoMsg.getData())
-                
+                let sizeOfPhoto = Int(sizeOfPhotoMsg.getData())                
                 image = UIImage(data: (try receiveImage(ofSize: sizeOfPhoto!))) ?? UIImage()
                 currentlyReceiving = false
             }
@@ -113,6 +112,26 @@ class NetworkConnection {
         }
         
         return image
+    }
+    
+    public func updateImage(withHash hash: String, data: Data) -> Int {
+        let updateImageMsg = PSMessage(endian: endian, version: version, instruction: 30, data: hash, token: token)
+        var result: Int?
+        do {
+            try send(msg: updateImageMsg)
+            
+            let imageSize = data.count
+            let imageSizeMsg = PSMessage(endian: endian, version: version, instruction: 31, data: "\(imageSize)", token: token)
+            try send(msg: imageSizeMsg)
+            try socket.write(from: data)
+            try socket.setReadTimeout(value: 20000)     //Gives 20 seconds to send entire photo
+            let importResultMsg = try receiveMessage()
+            try socket.setReadTimeout(value: 1000)
+            result = Int(importResultMsg.getData()) ?? 1
+        } catch {
+            result = 1       //Update failed
+        }
+        return result ?? 1
     }
     
     public func sendPhoto(fileName name: String, timeStamp: String, data: Data) -> Int {
@@ -160,22 +179,22 @@ class NetworkConnection {
             try send(msg: syncMsg)
             let numOfPhotosMsg = try receiveMessage()
             let numOfPhotos = Int(numOfPhotosMsg.getData())
-            for index in 0..<numOfPhotos!{
+            for _ in 0..<numOfPhotos!{
                 
                 let sizeOfPhotoMsg = try receiveMessage()
-                var sizeOfPhoto = Int(sizeOfPhotoMsg.getData())
+                let sizeOfPhoto = Int(sizeOfPhotoMsg.getData())
                 
                 let photoNameMsg = try receiveMessage()
-                var photoName = photoNameMsg.getData()
+                let photoName = photoNameMsg.getData()
                 
                 let hashOfPhotoMsg = try receiveMessage()
-                var hashOfPhoto = hashOfPhotoMsg.getData()
+                let hashOfPhoto = hashOfPhotoMsg.getData()
                 
                 let timeStampMsg = try receiveMessage()
-                var timeStampString = timeStampMsg.getData()
+                let timeStampString = timeStampMsg.getData()
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateFormat = "yyyy':'MM':'dd' 'HH':'mm':'ss"
-                var timeStampOfPhoto = dateFormatter.date(from: timeStampString)
+                let timeStampOfPhoto = dateFormatter.date(from: timeStampString)
                 
                 let image = try receiveImage(ofSize: sizeOfPhoto!)
                 

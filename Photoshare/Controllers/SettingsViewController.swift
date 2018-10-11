@@ -50,6 +50,7 @@ class SettingsViewController: UITableViewController {
     }
     
     @IBAction func connectButton(_ sender: UIButton) {
+        view.endEditing(true)
         var fieldsValid = true
         for textField in settingFields {
             if !checkForTextIn(textField: textField){

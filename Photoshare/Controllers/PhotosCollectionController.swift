@@ -15,7 +15,7 @@ class PhotosCollectionController: UICollectionViewController {
 
     // MARK: - Properties
     fileprivate let reuseIdentifier = "PhotoCell"
-    fileprivate let sectionInsets = UIEdgeInsets(top: 20.0, left: 10.0, bottom: 50.0, right: 10.0)
+    fileprivate let sectionInsets = UIEdgeInsets(top: 1.0, left: 1.0, bottom: 1.0, right: 1.0)
 
     //fileprivate var months = [Date]()
     fileprivate var photos = [PSPhoto]()
@@ -65,6 +65,7 @@ class PhotosCollectionController: UICollectionViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(false)
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
         do {
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             let context = appDelegate.persistentContainer.viewContext
@@ -81,7 +82,7 @@ class PhotosCollectionController: UICollectionViewController {
                     let localPath = getDirectory(withName: "Library/Photos").appendingPathComponent(fileName)
                     let thumbnail = UIImage(data : try! Data(contentsOf: thumbnailPath))
                     let hash = (data.value(forKey: "photohash") as! String)
-                    let photo = PSPhoto(fileName: fileName, thumbnail: thumbnail!, localPath: localPath, photoHash: hash)
+                    let photo = PSPhoto(fileName: fileName, thumbnail: thumbnail!, localPath: localPath, photoHash: hash, isCompressed: Photoshare.shared().compressionEnabled!)
                     photos.append(photo)
                 }
                 
@@ -166,9 +167,7 @@ extension PhotosCollectionController {
                                                       for: indexPath) as! PhotoCell
         
         let photo = photoForIndexPath(indexPath: indexPath)
-        cell.backgroundColor = UIColor.darkGray
-        
-        
+    
         
         //Not viewing an individual photo, everything is a thumbnail
         guard indexPath == fullSizePhotoIndexPath else {
@@ -178,55 +177,38 @@ extension PhotosCollectionController {
             return cell
         }
         
-        //Fullsize photo is available
-        guard photo.fullSizePhoto == nil else {
-            cell.imageView.image = photo.fullSizePhoto
-            return cell
-        }
-        
-        //Local photo is available
-        guard photo.localPhoto == nil else {
-            cell.imageView.image = photo.localPhoto
-            return cell
-        }
-        
-        cell.imageView.image = photo.thumbnail
-        photo.loadLocalPhoto()
-        cell.imageView.image = photo.localPhoto
-        
-        let loadFullSizeWorkItem = DispatchWorkItem {
-            if !Photoshare.shared().isConnected {
-                Photoshare.shared().start()
-            }
-            photo.loadfullSizePhoto { loadedPhoto, error in
-                
-                guard loadedPhoto.fullSizePhoto != nil && error == nil else {
-                    return
-                }
-                
-                if let cell = collectionView.cellForItem(at: indexPath) as? PhotoCell, indexPath == self.fullSizePhotoIndexPath {
-                    DispatchQueue.main.async {
-                        cell.imageView.image = loadedPhoto.fullSizePhoto
-                    }
-                }
-            }
-        }
-        
-        DispatchQueue.global().async(execute: loadFullSizeWorkItem)
-        
         
         return cell
     }
 }
 
-// MARK: - UICollectionViewDelegate
 extension PhotosCollectionController {
-    
-    override func collectionView(_ collectionView: UICollectionView,
-                                 shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        
-        fullSizePhotoIndexPath = fullSizePhotoIndexPath == indexPath ? nil : indexPath
-        
-        return false
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        print("pressed")
+        let viewController = storyboard?.instantiateViewController(withIdentifier: "PhotoDetailStoryboard") as? PhotoDetailViewController
+        if let viewController = viewController {
+            let photo = photoForIndexPath(indexPath: indexPath)
+            
+            viewController.photo = photo
+            viewController.indexPath = indexPath
+            viewController.image = photo.thumbnail
+            photo.loadLocalPhoto()
+            viewController.image = photo.localPhoto
+            navigationController?.pushViewController(viewController, animated: true)
+        }
     }
 }
+
+// MARK: - UICollectionViewDelegate
+//extension PhotosCollectionController {
+//
+//    override func collectionView(_ collectionView: UICollectionView,
+//                                 shouldSelectItemAt indexPath: IndexPath) -> Bool {
+//
+//        fullSizePhotoIndexPath = fullSizePhotoIndexPath == indexPath ? nil : indexPath
+//        print("selected")
+//        return false
+//    }
+//}
+
+

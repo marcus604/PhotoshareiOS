@@ -17,23 +17,19 @@ class PSPhoto {
     var localPath : URL
     var fileName : String
     var photoHash : String
+    var isCompressed : Bool
     
     
     
-    init (fileName : String, thumbnail : UIImage, localPath : URL, photoHash : String) {
+    init (fileName : String, thumbnail : UIImage, localPath : URL, photoHash : String, isCompressed: Bool) {
         self.fileName = fileName
         self.thumbnail = thumbnail
         self.localPath = localPath
         self.photoHash = photoHash
+        self.isCompressed = isCompressed
     }
     
-//    init (photoPath : URL, photoHash : String, thumbnail : UIImage, localPhoto : UIImage) {
-//        self.photoPath = photoPath
-//        self.photoHash = photoHash
-//        self.thumbnail = thumbnail
-//        self.localPhoto = localPhoto
-//    }
-    
+   
     func loadLocalPhoto() {
         self.localPhoto = UIImage(data : try! Data(contentsOf: self.localPath))
     }
@@ -41,6 +37,7 @@ class PSPhoto {
     func loadFullSizePhoto() {
         Photoshare.shared().getFullSizeImage(forPhoto: self)
     }
+    
     func loadLocalPhoto(_ completion: @escaping (_ photo: PSPhoto, _ error: NSError?) -> Void) {
         
         self.localPhoto = UIImage(data : try! Data(contentsOf: self.localPath))

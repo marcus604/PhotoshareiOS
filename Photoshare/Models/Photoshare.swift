@@ -17,6 +17,7 @@ class Photoshare {
     private var changedPhotos: [String]? //Need to create a class/struct for photo class
     private var photoLibrary: [String]?
     
+    public var compressionEnabled: Bool?
     public var isConnected = false
     public var status: String
     
@@ -88,7 +89,7 @@ class Photoshare {
     }
     public func getFullSizeImage(forPhoto photo: PSPhoto) {
         if !getUserSetting(asBoolFor: "compressionEnabled") {
-            photo.fullSizePhoto = nil
+            photo.fullSizePhoto = photo.localPhoto
             return
         }
         guard let connected = connection?.isConnected() else {
@@ -102,6 +103,41 @@ class Photoshare {
         }
         
     }
+    
+    public func updatePhoto(forPhoto photo: PSPhoto, image: UIImage) {
+        guard let connected = connection?.isConnected() else {
+            self.start()
+            return
+        }
+        let imageData = image.jpegData(compressionQuality: 1.0)
+        let result = connection?.updateImage(withHash: photo.photoHash, data: imageData!)
+       
+        switch result {
+        case 0: //Could optimizie this as its throwing away the data and then requesting it
+            status = "Updated Photo"
+            let fullPath = getDirectory(withName: "Library/Photos").appendingPathComponent(photo.fileName)
+            
+            
+            do {
+                try imageData!.write(to: fullPath)
+                var imageUIImage = UIImage(data: imageData!)
+                let fullPath = getDirectory(withName: "Library/Thumbnails").appendingPathComponent(photo.fileName)
+                imageUIImage = resizeImage(image: imageUIImage!, newWidth: 200)
+                if let data = imageUIImage!.jpegData(compressionQuality: 1) {
+                    try? data.write(to: fullPath)
+                }
+            } catch {
+                print("failed")
+            }
+        case 1:
+            status = "Failed to update photo"
+        default:
+            status = "Unknown Error"
+            
+        }
+
+    }
+    
     
     public func sendPhoto(asset: PHAsset) {
         var rawData = Data()
@@ -201,13 +237,13 @@ class Photoshare {
         if !settingsValid(with: settings)  {
             throw PhotoshareError.invalidSettings
         }
-        
+        compressionEnabled = settings["compressionEnabled"] as! Bool
         do {
             connection = try NetworkConnection(
                 hostName: settings["hostName"] as! String,
                 port: settings["port"] as! Int,
                 allowSelfSignedCerts: settings["allowSelfSignedCerts"] as! Bool,
-                compressionEnabled: settings["compressionEnabled"] as! Bool,
+                compressionEnabled: compressionEnabled!,
                 userName: settings["userName"] as! String,
                 password: settings["password"] as! String
                 )
@@ -312,8 +348,23 @@ class Photoshare {
         
     }
     
+    func resizeImage(image: UIImage, newWidth: CGFloat) -> UIImage {
+        let scale = newWidth / image.size.width
+        let newHeight = image.size.height * scale
+        UIGraphicsBeginImageContext(CGSize(width: newWidth, height: newHeight))
+        image.draw(in: CGRect(x: 0, y: 0, width: newWidth, height: newHeight))
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return newImage!
+        
+    }
     
+    func getDirectory(withName name: String) -> URL {
+        let path = getDocumentsDirectory().appendingPathComponent(name, isDirectory: true)
+        return path
+    }
     
+   
     
     private func receive(message msg: PSMessage){
         

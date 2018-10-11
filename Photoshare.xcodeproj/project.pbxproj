@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		2C11B770213E5BE600C6A374 /* SwiftKeychainWrapper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C11B76F213E5BE600C6A374 /* SwiftKeychainWrapper.framework */; };
 		2C11B772213E5BFE00C6A374 /* SwiftKeychainWrapper.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C11B771213E5BFE00C6A374 /* SwiftKeychainWrapper.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		2C4C63E2216E71AA00F783AD /* PhotoDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4C63E1216E71AA00F783AD /* PhotoDetailViewController.swift */; };
+		2C4C63E6216ED9D200F783AD /* ScaledHeightImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4C63E5216ED9D200F783AD /* ScaledHeightImageView.swift */; };
 		2C65268E21260575006EF3BA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C65268D21260575006EF3BA /* AppDelegate.swift */; };
 		2C65269321260575006EF3BA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C65269121260575006EF3BA /* Main.storyboard */; };
 		2C65269521260576006EF3BA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2C65269421260576006EF3BA /* Assets.xcassets */; };
@@ -44,6 +46,8 @@
 /* Begin PBXFileReference section */
 		2C11B76F213E5BE600C6A374 /* SwiftKeychainWrapper.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftKeychainWrapper.framework; path = Carthage/Build/iOS/SwiftKeychainWrapper.framework; sourceTree = "<group>"; };
 		2C11B771213E5BFE00C6A374 /* SwiftKeychainWrapper.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftKeychainWrapper.framework; path = Carthage/Build/iOS/SwiftKeychainWrapper.framework; sourceTree = "<group>"; };
+		2C4C63E1216E71AA00F783AD /* PhotoDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoDetailViewController.swift; sourceTree = "<group>"; };
+		2C4C63E5216ED9D200F783AD /* ScaledHeightImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaledHeightImageView.swift; sourceTree = "<group>"; };
 		2C65268A21260575006EF3BA /* Photoshare.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Photoshare.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C65268D21260575006EF3BA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2C65269221260575006EF3BA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -145,8 +149,10 @@
 			isa = PBXGroup;
 			children = (
 				2C88271B21657B0B007DC1DB /* PhotoCell.swift */,
-				2C88271921657368007DC1DB /* PhotosCollectionController.swift */,
 				2C88273D2165C572007DC1DB /* SettingsViewController.swift */,
+				2C88271921657368007DC1DB /* PhotosCollectionController.swift */,
+				2C4C63E1216E71AA00F783AD /* PhotoDetailViewController.swift */,
+				2C4C63E5216ED9D200F783AD /* ScaledHeightImageView.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -266,6 +272,8 @@
 				2C88273E2165C572007DC1DB /* SettingsViewController.swift in Sources */,
 				2C88271C21657B0B007DC1DB /* PhotoCell.swift in Sources */,
 				2C65268E21260575006EF3BA /* AppDelegate.swift in Sources */,
+				2C4C63E6216ED9D200F783AD /* ScaledHeightImageView.swift in Sources */,
+				2C4C63E2216E71AA00F783AD /* PhotoDetailViewController.swift in Sources */,
 				2C88271E21657C7E007DC1DB /* Photo.swift in Sources */,
 				2CE8DFF52162822B00BDE47B /* Photoshare.xcdatamodeld in Sources */,
 				2C6526AA212608EA006EF3BA /* SSLService.swift in Sources */,
