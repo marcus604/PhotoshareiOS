@@ -10,7 +10,6 @@
 		2C11B770213E5BE600C6A374 /* SwiftKeychainWrapper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C11B76F213E5BE600C6A374 /* SwiftKeychainWrapper.framework */; };
 		2C11B772213E5BFE00C6A374 /* SwiftKeychainWrapper.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C11B771213E5BFE00C6A374 /* SwiftKeychainWrapper.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2C4C63E2216E71AA00F783AD /* PhotoDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4C63E1216E71AA00F783AD /* PhotoDetailViewController.swift */; };
-		2C4C63E6216ED9D200F783AD /* ScaledHeightImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4C63E5216ED9D200F783AD /* ScaledHeightImageView.swift */; };
 		2C65268E21260575006EF3BA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C65268D21260575006EF3BA /* AppDelegate.swift */; };
 		2C65269321260575006EF3BA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C65269121260575006EF3BA /* Main.storyboard */; };
 		2C65269521260576006EF3BA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2C65269421260576006EF3BA /* Assets.xcassets */; };
@@ -26,6 +25,8 @@
 		2C88271E21657C7E007DC1DB /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C88271D21657C7E007DC1DB /* Photo.swift */; };
 		2C88273E2165C572007DC1DB /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C88273D2165C572007DC1DB /* SettingsViewController.swift */; };
 		2C8827402165D4E8007DC1DB /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C88273F2165D4E8007DC1DB /* UserSettings.swift */; };
+		2CA2FACC216F250B003D4058 /* PhotoCropEditor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CA2FACB216F250B003D4058 /* PhotoCropEditor.framework */; };
+		2CA2FACE216F2528003D4058 /* PhotoCropEditor.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2CA2FACD216F2528003D4058 /* PhotoCropEditor.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2CE8DFF52162822B00BDE47B /* Photoshare.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2CE8DFF32162822B00BDE47B /* Photoshare.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
@@ -38,6 +39,7 @@
 			files = (
 				2C6526A6212607DD006EF3BA /* Socket.framework in CopyFiles */,
 				2C11B772213E5BFE00C6A374 /* SwiftKeychainWrapper.framework in CopyFiles */,
+				2CA2FACE216F2528003D4058 /* PhotoCropEditor.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -47,7 +49,6 @@
 		2C11B76F213E5BE600C6A374 /* SwiftKeychainWrapper.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftKeychainWrapper.framework; path = Carthage/Build/iOS/SwiftKeychainWrapper.framework; sourceTree = "<group>"; };
 		2C11B771213E5BFE00C6A374 /* SwiftKeychainWrapper.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftKeychainWrapper.framework; path = Carthage/Build/iOS/SwiftKeychainWrapper.framework; sourceTree = "<group>"; };
 		2C4C63E1216E71AA00F783AD /* PhotoDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoDetailViewController.swift; sourceTree = "<group>"; };
-		2C4C63E5216ED9D200F783AD /* ScaledHeightImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaledHeightImageView.swift; sourceTree = "<group>"; };
 		2C65268A21260575006EF3BA /* Photoshare.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Photoshare.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C65268D21260575006EF3BA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2C65269221260575006EF3BA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -67,6 +68,8 @@
 		2C88271D21657C7E007DC1DB /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
 		2C88273D2165C572007DC1DB /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		2C88273F2165D4E8007DC1DB /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
+		2CA2FACB216F250B003D4058 /* PhotoCropEditor.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhotoCropEditor.framework; path = Carthage/Build/iOS/PhotoCropEditor.framework; sourceTree = "<group>"; };
+		2CA2FACD216F2528003D4058 /* PhotoCropEditor.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhotoCropEditor.framework; path = Carthage/Build/iOS/PhotoCropEditor.framework; sourceTree = "<group>"; };
 		2CE8DFF42162822B00BDE47B /* Photoshare.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Photoshare.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -77,6 +80,7 @@
 			files = (
 				2C6526A2212607A7006EF3BA /* Socket.framework in Frameworks */,
 				2C11B770213E5BE600C6A374 /* SwiftKeychainWrapper.framework in Frameworks */,
+				2CA2FACC216F250B003D4058 /* PhotoCropEditor.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,6 +90,7 @@
 		2C65268121260575006EF3BA = {
 			isa = PBXGroup;
 			children = (
+				2CA2FACD216F2528003D4058 /* PhotoCropEditor.framework */,
 				2C11B771213E5BFE00C6A374 /* SwiftKeychainWrapper.framework */,
 				2C6526A5212607DD006EF3BA /* Socket.framework */,
 				2C65268C21260575006EF3BA /* Photoshare */,
@@ -105,6 +110,7 @@
 		2C65268C21260575006EF3BA /* Photoshare */ = {
 			isa = PBXGroup;
 			children = (
+				2CA2FABC216F21A0003D4058 /* Libraries */,
 				2CCFEC30216417F100158044 /* Models */,
 				2CCFEC2F216417E000158044 /* Controllers */,
 				2CCFEC2E216414B900158044 /* Views */,
@@ -118,7 +124,6 @@
 		2C65269F212605AB006EF3BA /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				2C6526A9212608EA006EF3BA /* SSLService.swift */,
 				2C65268D21260575006EF3BA /* AppDelegate.swift */,
 				2CE8DFF32162822B00BDE47B /* Photoshare.xcdatamodeld */,
 				2C65269421260576006EF3BA /* Assets.xcassets */,
@@ -129,11 +134,20 @@
 		2C6526A0212607A7006EF3BA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2CA2FACB216F250B003D4058 /* PhotoCropEditor.framework */,
 				2C11B76F213E5BE600C6A374 /* SwiftKeychainWrapper.framework */,
 				2C6DE6E8213D0DA000C9E440 /* Locksmith.framework */,
 				2C6526A1212607A7006EF3BA /* Socket.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		2CA2FABC216F21A0003D4058 /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				2C6526A9212608EA006EF3BA /* SSLService.swift */,
+			);
+			path = Libraries;
 			sourceTree = "<group>";
 		};
 		2CCFEC2E216414B900158044 /* Views */ = {
@@ -152,7 +166,6 @@
 				2C88273D2165C572007DC1DB /* SettingsViewController.swift */,
 				2C88271921657368007DC1DB /* PhotosCollectionController.swift */,
 				2C4C63E1216E71AA00F783AD /* PhotoDetailViewController.swift */,
-				2C4C63E5216ED9D200F783AD /* ScaledHeightImageView.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -252,12 +265,13 @@
 			inputPaths = (
 				"$(SRCROOT)/Carthage/Build/iOS/Socket.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/SwiftKeychainWrapper.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/PhotoCropEditor.framework",
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = "/usr/local/bin/carthage copy-frameworks";
-			shellScript = "";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -272,7 +286,6 @@
 				2C88273E2165C572007DC1DB /* SettingsViewController.swift in Sources */,
 				2C88271C21657B0B007DC1DB /* PhotoCell.swift in Sources */,
 				2C65268E21260575006EF3BA /* AppDelegate.swift in Sources */,
-				2C4C63E6216ED9D200F783AD /* ScaledHeightImageView.swift in Sources */,
 				2C4C63E2216E71AA00F783AD /* PhotoDetailViewController.swift in Sources */,
 				2C88271E21657C7E007DC1DB /* Photo.swift in Sources */,
 				2CE8DFF52162822B00BDE47B /* Photoshare.xcdatamodeld in Sources */,

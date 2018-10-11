@@ -7,13 +7,26 @@
 //
 
 import UIKit
+import PhotoCropEditor
 
-class PhotoDetailViewController: UIViewController {
 
-    var hideNavItems = false
+class PhotoDetailViewController: UIViewController, UIScrollViewDelegate, CropViewControllerDelegate {
+    
+    
+
+    private var hideNavItems = false
+    private var isInEditMode = false
+    
     
     @IBOutlet weak var imageView: UIImageView!
     
+    @IBOutlet weak var scrollView: UIScrollView! {
+        didSet{
+            scrollView.delegate = self
+            scrollView.minimumZoomScale = 1.0
+            scrollView.maximumZoomScale = 10.0
+        }
+    }
     var image: UIImage!
     var photo: PSPhoto!
     var indexPath: IndexPath!
@@ -38,10 +51,6 @@ class PhotoDetailViewController: UIViewController {
         
         assert(image != nil, "Image not set; required to use view controller")
         imageView.image = image
-        editButton = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(editTapped))
-        editButton.isEnabled = false
-
-        navigationItem.rightBarButtonItem = editButton
         //Fullsize photo is available
         guard photo.fullSizePhoto == nil else {
             imageView.image = photo.fullSizePhoto
@@ -70,47 +79,42 @@ class PhotoDetailViewController: UIViewController {
     }
     
     @objc private func editTapped() {
-        view.backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
-        navigationController?.navigationBar.barTintColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
-        navigationController?.navigationBar.tintColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
-        let saveButton = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(saveTapped))
-        let cropButton = UIBarButtonItem(title: "Crop", style: .plain, target: self, action: #selector(cropTapped))
-        let rotateButton = UIBarButtonItem(title: "Rotate", style: .plain, target: self, action: #selector(rotateTapped))
-        
-        navigationItem.leftItemsSupplementBackButton = true
-        navigationItem.rightBarButtonItem = saveButton
-        navigationItem.leftBarButtonItems = [cropButton, rotateButton]
-        
-        hideNavItems = !hideNavItems
-        setNeedsStatusBarAppearanceUpdate()
-        toggleViewGesture.isEnabled = false
-        self.tabBarController?.tabBar.isHidden = true
-        
+        isInEditMode = true
+        toggleEditView()
     }
     
     @objc private func saveTapped() {
-        print("save")
         Photoshare.shared().updatePhoto(forPhoto: photo, image: self.imageView.image!)
-        view.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
-        navigationController?.navigationBar.barTintColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-        navigationController?.navigationBar.tintColor = UIView().tintColor!
-        self.tabBarController?.tabBar.isHidden = false
+        isInEditMode = false
+        toggleEditView()
         
-        navigationItem.rightBarButtonItem = editButton
-        navigationItem.leftBarButtonItems = nil
-        toggleViewGesture.isEnabled = true
-        
-        hideNavItems = !hideNavItems
-        setNeedsStatusBarAppearanceUpdate()
+//        view.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+//        navigationController?.navigationBar.barTintColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+//        navigationController?.navigationBar.tintColor = UIView().tintColor!
+//        self.tabBarController?.tabBar.isHidden = false
+//
+//        navigationItem.rightBarButtonItem = editButton
+//        navigationItem.leftBarButtonItems = nil
+//        toggleViewGesture.isEnabled = true
+//
+//        hideNavItems = !hideNavItems
+//        setNeedsStatusBarAppearanceUpdate()
         
     }
     
     @objc private func cropTapped() {
-        print("crop")
+        let controller = CropViewController()
+        controller.delegate = self
+        controller.image = imageView.image
+        controller.toolbarHidden = true
+        let navController = UINavigationController(rootViewController: controller)
+        navController.navigationBar.barTintColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
+        navController.navigationBar.tintColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+        present(navController, animated: true, completion: nil)
+        
     }
     
     @objc private func rotateTapped() {
-        print("hi")
         image = imageView.image
         let rotatedImage = image.fixedOrientation().imageRotatedByDegrees(degrees: 90.0)
         imageView.image = rotatedImage
@@ -123,23 +127,66 @@ class PhotoDetailViewController: UIViewController {
         self.navigationController?.setNavigationBarHidden(hideNavItems, animated: false)
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        view.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
-        navigationController?.navigationBar.barTintColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-        navigationController?.navigationBar.tintColor = UIView().tintColor!
-        hideNavItems = false
-        toggleNavItems()
-        setNeedsStatusBarAppearanceUpdate()
-    }
     //Default is show everything
     override func viewWillAppear(_ animated: Bool) {
-        view.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
         super.viewWillAppear(animated)
-        toggleNavItems()
+        toggleEditView()
+    }
+    
+    private func toggleEditView() {
+        if isInEditMode {
+            view.backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
+            navigationController?.navigationBar.barTintColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
+            navigationController?.navigationBar.tintColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+            let saveButton = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(saveTapped))
+            let cropButton = UIBarButtonItem(title: "Crop", style: .plain, target: self, action: #selector(cropTapped))
+            let rotateButton = UIBarButtonItem(title: "Rotate", style: .plain, target: self, action: #selector(rotateTapped))
+            
+            navigationItem.leftItemsSupplementBackButton = true
+            navigationItem.rightBarButtonItem = saveButton
+            navigationItem.leftBarButtonItems = [cropButton, rotateButton]
+            
+            hideNavItems = isEditing
+            toggleNavItems()
+            toggleViewGesture.isEnabled = false
+            self.tabBarController?.tabBar.isHidden = true
+        } else {
+            view.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+            navigationController?.navigationBar.barTintColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+            navigationController?.navigationBar.tintColor = UIView().tintColor!
+            hideNavItems = isEditing
+            editButton = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(editTapped))
+            editButton.isEnabled = false
+            navigationItem.rightBarButtonItem = editButton
+            hideNavItems = isEditing
+            toggleNavItems()
+            navigationItem.leftBarButtonItems = nil
+            toggleViewGesture.isEnabled = true
+        }
+        setNeedsStatusBarAppearanceUpdate()
+        
+        
     }
     
     override var prefersStatusBarHidden: Bool {
         return hideNavItems
+    }
+    
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return imageView
+    }
+    
+    //DELEGATES
+    func cropViewController(_ controller: CropViewController, didFinishCroppingImage image: UIImage) {
+    }
+    
+    func cropViewController(_ controller: CropViewController, didFinishCroppingImage image: UIImage, transform: CGAffineTransform, cropRect: CGRect) {
+        imageView.image = image
+        controller.dismiss(animated: true, completion: nil)
+    }
+    
+    func cropViewControllerDidCancel(_ controller: CropViewController) {
+        controller.dismiss(animated: true, completion: nil)
     }
     
     /*

@@ -66,17 +66,33 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Ugd-BN-wgE">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
-                            </imageView>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zUI-Lg-xQL">
+                                <rect key="frame" x="0.0" y="64" width="414" height="672"/>
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ugd-BN-wgE">
+                                        <rect key="frame" x="0.0" y="-64" width="414" height="736"/>
+                                    </imageView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="Ugd-BN-wgE" firstAttribute="bottom" secondItem="zUI-Lg-xQL" secondAttribute="bottom" id="8Fq-D7-Spj"/>
+                                    <constraint firstItem="Ugd-BN-wgE" firstAttribute="top" secondItem="zUI-Lg-xQL" secondAttribute="top" id="Ncz-7J-BmH"/>
+                                    <constraint firstItem="Ugd-BN-wgE" firstAttribute="centerX" secondItem="zUI-Lg-xQL" secondAttribute="centerX" id="Nfy-Nw-USm"/>
+                                    <constraint firstItem="Ugd-BN-wgE" firstAttribute="centerY" secondItem="zUI-Lg-xQL" secondAttribute="centerY" id="azS-Yv-S6Q"/>
+                                    <constraint firstItem="Ugd-BN-wgE" firstAttribute="leading" secondItem="zUI-Lg-xQL" secondAttribute="leading" id="irF-pd-wrR"/>
+                                    <constraint firstAttribute="trailing" secondItem="Ugd-BN-wgE" secondAttribute="trailing" id="se6-31-zJR"/>
+                                </constraints>
+                                <connections>
+                                    <outlet property="delegate" destination="0aJ-XH-vmm" id="Rnd-2o-juZ"/>
+                                </connections>
+                            </scrollView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <gestureRecognizers/>
                         <constraints>
-                            <constraint firstItem="Ugd-BN-wgE" firstAttribute="leading" secondItem="c5o-aV-gG9" secondAttribute="leading" id="0T3-dC-aTz"/>
-                            <constraint firstItem="Ugd-BN-wgE" firstAttribute="top" secondItem="lT5-Pr-Ayf" secondAttribute="top" id="hfd-oa-Niq"/>
-                            <constraint firstItem="Ugd-BN-wgE" firstAttribute="bottom" secondItem="lT5-Pr-Ayf" secondAttribute="bottom" id="mH6-e3-exa"/>
-                            <constraint firstItem="Ugd-BN-wgE" firstAttribute="trailing" secondItem="c5o-aV-gG9" secondAttribute="trailing" id="tCe-EA-KU0"/>
+                            <constraint firstItem="zUI-Lg-xQL" firstAttribute="top" secondItem="c5o-aV-gG9" secondAttribute="top" id="23n-cp-fZ1"/>
+                            <constraint firstItem="zUI-Lg-xQL" firstAttribute="bottom" secondItem="c5o-aV-gG9" secondAttribute="bottom" id="6Vp-Le-rsM"/>
+                            <constraint firstItem="zUI-Lg-xQL" firstAttribute="leading" secondItem="lT5-Pr-Ayf" secondAttribute="leading" id="W3l-ZO-KVh"/>
+                            <constraint firstAttribute="trailing" secondItem="zUI-Lg-xQL" secondAttribute="trailing" id="tEa-lE-sgZ"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="c5o-aV-gG9"/>
                         <connections>
@@ -86,6 +102,7 @@
                     <navigationItem key="navigationItem" id="ghD-VJ-KZ5"/>
                     <connections>
                         <outlet property="imageView" destination="Ugd-BN-wgE" id="h2E-y0-qjf"/>
+                        <outlet property="scrollView" destination="zUI-Lg-xQL" id="mv0-rQ-Unt"/>
                         <outlet property="toggleViewGesture" destination="0zj-q7-wiJ" id="B3k-pT-Rdt"/>
                     </connections>
                 </viewController>

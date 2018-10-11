@@ -1,2 +1,3 @@
 github "IBM-Swift/BlueSocket" "1.0.22"
 github "jrendel/SwiftKeychainWrapper" "3.0.1"
+github "sprint84/CropViewController" "1.2.4"
