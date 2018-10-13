@@ -1,3 +1,4 @@
 github "IBM-Swift/BlueSocket"
 github "jrendel/SwiftKeychainWrapper"
 github "sprint84/CropViewController"
+github "facebook/pop"

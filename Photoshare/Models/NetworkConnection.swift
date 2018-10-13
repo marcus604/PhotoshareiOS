@@ -35,7 +35,8 @@ class NetworkConnection {
     
     private var currentlyReceiving = false
     
-    private let SYNC_INSTRUCTION = 1
+    private let INSTRUCTION_SYNC = 1
+    private let INSTRUCTION_DELETE = 50
     
    
     
@@ -167,14 +168,14 @@ class NetworkConnection {
         return UserDefaults.standard.object(forKey: "\(key)") as? String ?? String()
     }
     
-    public func sync(compressionEnabled: Bool) throws{
+    public func sync(compressionEnabled: Bool) throws -> Int{
         var compressionFlag: String
         if compressionEnabled {
             compressionFlag = "1"
         } else {
             compressionFlag = "0"
         }
-        let syncMsg = PSMessage(endian: endian, version: version, instruction: SYNC_INSTRUCTION, data: compressionFlag, token: token)
+        let syncMsg = PSMessage(endian: endian, version: version, instruction: INSTRUCTION_SYNC, data: compressionFlag, token: token)
         do {
             try send(msg: syncMsg)
             let numOfPhotosMsg = try receiveMessage()
@@ -225,10 +226,11 @@ class NetworkConnection {
                     }
                     
                 } catch {
+                    print(error)
                     print("Couldn't write file")
                 }
             }
-            print("Synced \(numOfPhotos) photos")
+            return numOfPhotos ?? 0
         } catch {
             throw error
         }
@@ -246,6 +248,22 @@ class NetworkConnection {
         UIGraphicsEndImageContext()
         return newImage!
         
+    }
+    
+    
+    func delete(photo hash: String) -> Bool{
+        let deleteMsg = PSMessage(endian: endian, version: version, instruction: INSTRUCTION_DELETE, data: hash, token: token)
+        do {
+            try send(msg: deleteMsg)
+            try socket.setReadTimeout(value: 10000)
+            let importResultMsg = try receiveMessage()
+            try socket.setReadTimeout(value: 1000)
+            let result = importResultMsg.getData()
+            if result == "0" {
+                return true
+            }
+        } catch {}
+        return false
     }
     
     func savePhoto(image: Data, fileName: String) {
@@ -353,6 +371,10 @@ class NetworkConnection {
     }
    
     
+}
+
+extension Int {
+    var boolValue: Bool { return self != 0 }
 }
 
 

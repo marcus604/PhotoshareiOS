@@ -14,24 +14,38 @@ class PSPhoto {
     var fullSizePhoto : UIImage?
     var localPhoto : UIImage?
     var thumbnail : UIImage?
+    var fullSizePath : URL?
     var localPath : URL
+    var thumbnailPath : URL
     var fileName : String
     var photoHash : String
     var isCompressed : Bool
     
     
     
-    init (fileName : String, thumbnail : UIImage, localPath : URL, photoHash : String, isCompressed: Bool) {
+    init (fileName : String, thumbnailPath : URL, localPath : URL, photoHash : String, isCompressed: Bool) {
         self.fileName = fileName
-        self.thumbnail = thumbnail
         self.localPath = localPath
         self.photoHash = photoHash
+        self.thumbnailPath = thumbnailPath
         self.isCompressed = isCompressed
     }
     
+    func loadThumbnailPhoto() {
+        do {
+            self.thumbnail = UIImage(data : try Data(contentsOf: self.thumbnailPath))
+        } catch {
+            self.thumbnail = UIImage(named: "NO_IMAGE")
+        }
+        
+    }
    
     func loadLocalPhoto() {
-        self.localPhoto = UIImage(data : try! Data(contentsOf: self.localPath))
+        do {
+            self.localPhoto = UIImage(data : try Data(contentsOf: self.localPath))
+        } catch {
+            self.localPhoto = UIImage(named: "NO_IMAGE")
+        }
     }
     
     func loadFullSizePhoto() {

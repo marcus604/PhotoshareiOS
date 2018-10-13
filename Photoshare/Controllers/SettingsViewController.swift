@@ -51,35 +51,32 @@ class SettingsViewController: UITableViewController {
     
     @IBAction func connectButton(_ sender: UIButton) {
         view.endEditing(true)
-        var fieldsValid = true
+        
+        //Check for text in each field
+        //If no text highlight red
         for textField in settingFields {
-            if !checkForTextIn(textField: textField){
-                fieldsValid = false
-            } else {
-                let text = textField.text!
+            if checkForTextIn(textField: textField) {
                 switch textField {
                 case hostnameTextField:
-                    Photoshare.shared().set(settingAsString: "hostName", to: text)
+                    Photoshare.shared().set(settingAsString: "hostName", to: textField.text!)
                 case portTextField:
-                    var int = Int(text) ?? 0
-                    if int > 65535 || int < 1024 {
-                        int = 0
-                    }
-                    Photoshare.shared().set(settingAsInt: "port", to: int)
+                    Photoshare.shared().set(settingAsInt: "port", to: Int(textField.text!)!)    //Only showing user numerical keyboard, can safely assume that its an int
                 case userNameTextField:
-                    Photoshare.shared().set(settingAsString: "userName", to: text)
+                    Photoshare.shared().set(settingAsString: "userName", to: textField.text!)
                 case passwordTextField:
-                    Photoshare.shared().set(password: text)
+                    Photoshare.shared().set(password: textField.text!)
                 default:
-                    break
+                    continue
                 }
             }
         }
-        
         Photoshare.shared().set(settingAsBool: "allowSelfSignedCerts", to: selfSignedCertSwitch.isOn)
         Photoshare.shared().set(settingAsBool: "compressionEnabled", to: compressionSwitch.isOn)
+            
+        //Scrutinize user input more
+        Photoshare.shared().validateSettings()
         
-        if fieldsValid {
+        if Photoshare.shared().allSettingsValid {
             connectionStatusLabel.text = Photoshare.shared().status
             DispatchQueue.global(qos: .userInitiated).async {
                 Photoshare.shared().start()
@@ -90,7 +87,12 @@ class SettingsViewController: UITableViewController {
                     self.connectionStatusLabel.text = Photoshare.shared().status
                 }
             }
+        } else {
+            //Could get which settings are invalid and highlight to user
         }
+        
+        
+    
     }
     
     //Verifies that textfield has text in it, if not sets border to red
@@ -107,10 +109,11 @@ class SettingsViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let settings = Photoshare.shared().getSettings()
+        let settings = Photoshare.shared().settings
+        
         imagePicker.delegate = self
             
-        if Photoshare.shared().settingsValid(with: settings) {
+        if Photoshare.shared().allSettingsValid {
             hostnameTextField.insertText(settings["hostName"] as! String)
             portTextField.insertText("\(settings["port"] as! Int)")
             userNameTextField.insertText(settings["userName"] as! String)

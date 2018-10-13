@@ -8,7 +8,7 @@
 
 import UIKit
 import PhotoCropEditor
-
+import os.log
 
 class PhotoDetailViewController: UIViewController, UIScrollViewDelegate, CropViewControllerDelegate {
     
@@ -27,11 +27,14 @@ class PhotoDetailViewController: UIViewController, UIScrollViewDelegate, CropVie
             scrollView.maximumZoomScale = 10.0
         }
     }
-    var image: UIImage!
+    
+    var photos: [PSPhoto]!      //Used if manage mode started, allows it to read from same place in memory
+    var indexPath: IndexPath!   //Start manage mode on current index
     var photo: PSPhoto!
-    var indexPath: IndexPath!
+   
     
     var editButton: UIBarButtonItem!
+    var manageButton: UIBarButtonItem!
    
     @IBOutlet var toggleViewGesture: UITapGestureRecognizer!
     
@@ -48,9 +51,10 @@ class PhotoDetailViewController: UIViewController, UIScrollViewDelegate, CropVie
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        os_log(.debug, log: OSLog.default, "viewDidLoad: PhotoDetailView")
+        assert(photo != nil, "Image not set; required to use view controller")
+        imageView.image = photo.localPhoto
         
-        assert(image != nil, "Image not set; required to use view controller")
-        imageView.image = image
         //Fullsize photo is available
         guard photo.fullSizePhoto == nil else {
             imageView.image = photo.fullSizePhoto
@@ -68,6 +72,8 @@ class PhotoDetailViewController: UIViewController, UIScrollViewDelegate, CropVie
                 }
 
                 DispatchQueue.main.async {
+                    os_log(.debug, log: OSLog.default, "Loaded full size photo")
+                    self.photo = loadedPhoto
                     self.imageView.image = loadedPhoto.fullSizePhoto
                     self.editButton.isEnabled = true
                 }
@@ -75,7 +81,7 @@ class PhotoDetailViewController: UIViewController, UIScrollViewDelegate, CropVie
             }
         }
 
-        DispatchQueue.global().async(execute: loadFullSizeWorkItem)
+        DispatchQueue.global(qos: .utility).async(execute: loadFullSizeWorkItem)
     }
     
     @objc private func editTapped() {
@@ -83,26 +89,24 @@ class PhotoDetailViewController: UIViewController, UIScrollViewDelegate, CropVie
         toggleEditView()
     }
     
-    @objc private func saveTapped() {
-        Photoshare.shared().updatePhoto(forPhoto: photo, image: self.imageView.image!)
-        isInEditMode = false
-        toggleEditView()
-        
-//        view.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
-//        navigationController?.navigationBar.barTintColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-//        navigationController?.navigationBar.tintColor = UIView().tintColor!
-//        self.tabBarController?.tabBar.isHidden = false
-//
-//        navigationItem.rightBarButtonItem = editButton
-//        navigationItem.leftBarButtonItems = nil
-//        toggleViewGesture.isEnabled = true
-//
-//        hideNavItems = !hideNavItems
-//        setNeedsStatusBarAppearanceUpdate()
-        
+    //Load view controller
+    //Parse photos array as manage can only work one way. No way to access previous photos
+    @objc private func manageTapped() {
+        let viewController = storyboard?.instantiateViewController(withIdentifier: "ManageModeViewController") as? ManageModeViewController
+        viewController!.indexPath = self.indexPath
+        let photosAfterIndex = photos[indexPath[1]...]
+        viewController!.photos = Array(photosAfterIndex)
+        viewController!.photo = self.photo
+        navigationController?.pushViewController(viewController!, animated: true)
     }
     
-    @objc private func cropTapped() {
+    @objc private func saveTapped() {
+        Photoshare.shared().updatePhoto(forPhoto: photo)
+        isInEditMode = false
+        toggleEditView()
+    }
+    
+    @objc private func cropTapped() {   //Prepare new view controller, new controller sets imageView.image
         let controller = CropViewController()
         controller.delegate = self
         controller.image = imageView.image
@@ -115,9 +119,8 @@ class PhotoDetailViewController: UIViewController, UIScrollViewDelegate, CropVie
     }
     
     @objc private func rotateTapped() {
-        image = imageView.image
-        let rotatedImage = image.fixedOrientation().imageRotatedByDegrees(degrees: 90.0)
-        imageView.image = rotatedImage
+        photo.fullSizePhoto = photo.fullSizePhoto!.fixedOrientation().imageRotatedByDegrees(degrees: 90.0)
+        imageView.image = photo.fullSizePhoto
     }
     
     
@@ -130,6 +133,7 @@ class PhotoDetailViewController: UIViewController, UIScrollViewDelegate, CropVie
     //Default is show everything
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        os_log(.debug, log: OSLog.default, "viewWillAppear: PhotoDetailView")
         toggleEditView()
     }
     
@@ -141,7 +145,7 @@ class PhotoDetailViewController: UIViewController, UIScrollViewDelegate, CropVie
             let saveButton = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(saveTapped))
             let cropButton = UIBarButtonItem(title: "Crop", style: .plain, target: self, action: #selector(cropTapped))
             let rotateButton = UIBarButtonItem(title: "Rotate", style: .plain, target: self, action: #selector(rotateTapped))
-            
+            navigationItem.rightBarButtonItem = nil
             navigationItem.leftItemsSupplementBackButton = true
             navigationItem.rightBarButtonItem = saveButton
             navigationItem.leftBarButtonItems = [cropButton, rotateButton]
@@ -157,7 +161,8 @@ class PhotoDetailViewController: UIViewController, UIScrollViewDelegate, CropVie
             hideNavItems = isEditing
             editButton = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(editTapped))
             editButton.isEnabled = false
-            navigationItem.rightBarButtonItem = editButton
+            manageButton = UIBarButtonItem(title: "Manage", style: .plain, target: self, action: #selector(manageTapped))
+            navigationItem.rightBarButtonItems = [editButton, manageButton]
             hideNavItems = isEditing
             toggleNavItems()
             navigationItem.leftBarButtonItems = nil
@@ -181,7 +186,8 @@ class PhotoDetailViewController: UIViewController, UIScrollViewDelegate, CropVie
     }
     
     func cropViewController(_ controller: CropViewController, didFinishCroppingImage image: UIImage, transform: CGAffineTransform, cropRect: CGRect) {
-        imageView.image = image
+        photo.fullSizePhoto = image
+        imageView.image = photo.fullSizePhoto
         controller.dismiss(animated: true, completion: nil)
     }
     

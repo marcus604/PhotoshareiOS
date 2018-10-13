@@ -9,31 +9,116 @@
 import Foundation
 import SwiftKeychainWrapper
 import Photos
+import CoreData
+import os.log
 
 
 class Photoshare {
     
     private var connection: NetworkConnection?
     private var changedPhotos: [String]? //Need to create a class/struct for photo class
-    private var photoLibrary: [String]?
     
+    private var photos: [PSPhoto]!
+    
+    //Settings
     public var compressionEnabled: Bool?
+    private var allowSelfSignedCerts: Bool?
+    
+    private var hostName: String?
+    private var port: Int?
+    private var userName: String?
+    private var password: String?
+    
+    
+    static var realDelegate: AppDelegate?
+    
+    static var appDelegate: AppDelegate {
+        if Thread.isMainThread{
+            return UIApplication.shared.delegate as! AppDelegate;
+        }
+        let dg = DispatchGroup();
+        dg.enter()
+        DispatchQueue.main.async{
+            realDelegate = UIApplication.shared.delegate as? AppDelegate;
+            dg.leave();
+        }
+        dg.wait();
+        return realDelegate!;
+    }
+    
+    
+    public var settings = [String: Any]()
+    public var settingsValid = [String: Bool]()
+    public var allSettingsValid = false
+    
     public var isConnected = false
     public var status: String
+    public var lastOperationSuccess = false
     
     
     private static var sharedPhotoshare: Photoshare = {
+        os_log(.debug, log: OSLog.default, "Accessing shared Photoshare instance")
         let photoshare = Photoshare()
+        photoshare.validateSettings()
+        photoshare.generatePhotos()
+        if photoshare.photos.count == 0{    //If no photos then directories might not. Silent return if directory creation fails
+            photoshare.createDirectory(withName: "Library/Photos/")
+            photoshare.createDirectory(withName: "Library/Thumbnails/")
+        }
         
         return photoshare
     }()
     
-   
-    
-    
     init() {
         status = "Not Connected"
+        os_log("Starting Photoshare", log: OSLog.default, type: .debug)
     }
+    
+    
+    private func generateSettings() {
+        settings["hostName"] = getUserSetting(asStringfor: "hostName")
+        settings["port"] = getUserSetting(asIntFor: "port")
+        settings["userName"] = getUserSetting(asStringfor: "userName")
+        settings["password"] = getPassword()
+        
+        settings["allowSelfSignedCerts"] = getUserSetting(asBoolFor: "allowSelfSignedCerts")
+        settings["compressionEnabled"] = getUserSetting(asBoolFor: "compressionEnabled")
+    }
+   
+    
+    //Sets individual setting status
+    //Can help tell user which setting is wrong
+    public func validateSettings(){
+        generateSettings()
+        for setting in settings {
+            settingsValid[setting.key] = false      //Everything starts invalid
+            switch setting.key {
+            case "port":
+                guard let port = setting.value as? Int else { continue }
+                if port > 1024 && port < 49151 { settingsValid[setting.key] = true }    //Could restric
+            case "allowSelfSignedCerts", "compressionEnabled":
+                guard let _ = setting.value as? Bool else { continue }
+                settingsValid[setting.key] = true
+            default:    //Is one of the strings
+                guard let stringValue = setting.value as? String else { continue }
+                if stringValue.count > 0 && stringValue.count < 140 { settingsValid[setting.key] = true }
+            }
+        }
+        
+        for settings in settingsValid {
+            
+            if !settings.value {
+                allSettingsValid = false
+                os_log(.debug, log: OSLog.default, "Settings Valid = %@", allSettingsValid.description)
+                break
+            }
+            allSettingsValid = true
+        }
+        os_log(.debug, log: OSLog.default, "Settings Valid = %@", allSettingsValid.description)
+        
+    }
+    
+   
     
     class func shared() -> Photoshare {
         return sharedPhotoshare
@@ -47,42 +132,62 @@ class Photoshare {
         //Do I have settings required to initiate a connection
         //Make the initial TCP and TLS handshake
         //let settingsValid = settingsValid()
+        if isConnected {
+            os_log(.debug, log: OSLog.default, "Already connected")
+            return
+        }
         do {
-            createDirectory(withName: "Library/Photos/")
-            createDirectory(withName: "Library/Thumbnails/")
-            try connection = connect()
+            try connection = connect(withSettings: settings)
+            os_log(.debug, log: OSLog.default, "TCP/TLS Handshake Success")
             status = "Authenticating"
             try connection?.handshake()
+            os_log(.debug, log: OSLog.default, "Photoshare Handshake Success")
             isConnected = true
         } catch PhotoshareError.failedConnection{
             status = "TCP/TLS Connection Failed"
+            os_log(.info, log: OSLog.default, "TCP/TLS Handshake Failure")
             connection?.stop()
         } catch PhotoshareError.failedUserAuthentication{
             status = "Invalid Credentials"
+            os_log(.info, log: OSLog.default, "Photoshare Handshake Failure")
             connection?.stop()
         } catch PhotoshareError.lostConnection{
             print("Lost Connection")
+            os_log(.info, log: OSLog.default, "Lost Connection")
             connection?.stop()
         } catch PhotoshareError.invalidSettings{
             print("Invalid Settings")
         } catch PhotoshareError.connectionTimeout{
             print("Connection Timeout")
+            os_log(.info, log: OSLog.default, "Connection timed out")
             connection?.stop()
         } catch {
             print("Unknown Error")
+            os_log(.info, log: OSLog.default, "Unknown Error")
             connection?.stop()
         }
     
     }
     
+    public func getPhotos() -> [PSPhoto]{
+        return photos
+    }
+    
+   
     public func sync() {
+        var numOfPhotosSynced = 0
         if isConnected {
             status = "Syncing"
             do {
-                try connection?.sync(compressionEnabled: getUserSetting(asBoolFor: "compressionEnabled"))
+                numOfPhotosSynced = try (connection?.sync(compressionEnabled: compressionEnabled ?? true))!
             } catch {
-                print("Failed to Sync")
+                isConnected = false
+                os_log(.error, log: OSLog.default, "Failed Sync")
             }
+            if numOfPhotosSynced != 0 {
+                generatePhotos()
+            }
+            os_log(.debug, log: OSLog.default, "Synced %d Photos", numOfPhotosSynced)
         }
         
         
@@ -104,20 +209,18 @@ class Photoshare {
         
     }
     
-    public func updatePhoto(forPhoto photo: PSPhoto, image: UIImage) {
+    public func updatePhoto(forPhoto photo: PSPhoto) {
         guard let connected = connection?.isConnected() else {
             self.start()
             return
         }
-        let imageData = image.jpegData(compressionQuality: 1.0)
+        let imageData = photo.fullSizePhoto!.jpegData(compressionQuality: 1.0)
         let result = connection?.updateImage(withHash: photo.photoHash, data: imageData!)
        
         switch result {
         case 0: //Could optimizie this as its throwing away the data and then requesting it
             status = "Updated Photo"
             let fullPath = getDirectory(withName: "Library/Photos").appendingPathComponent(photo.fileName)
-            
-            
             do {
                 try imageData!.write(to: fullPath)
                 var imageUIImage = UIImage(data: imageData!)
@@ -138,6 +241,77 @@ class Photoshare {
 
     }
     
+    private func generatePhotos() {
+        let appDelegate = AppDelegate.appDelegate
+        let context = appDelegate!.persistentContainer.viewContext
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Photos")
+        let sortDescriptor = NSSortDescriptor(key: "timestamp", ascending: false)
+        request.sortDescriptors = [sortDescriptor]
+        do {
+            let result = try context.fetch(request)
+            photos = [PSPhoto]()
+            for data in result as! [NSManagedObject] {
+                let fileName = (data.value(forKey: "fileName") as! String)
+                let thumbnailPath = getDirectory(withName: "Library/Thumbnails").appendingPathComponent(fileName)
+                let localPath = getDirectory(withName: "Library/Photos").appendingPathComponent(fileName)
+                //let thumbnail = UIImage(data : try! Data(contentsOf: thumbnailPath))
+                let hash = (data.value(forKey: "photohash") as! String)
+                let compressionEnabled = settings["compressionEnabled"] as? Bool
+                let photo = PSPhoto(fileName: fileName, thumbnailPath: thumbnailPath, localPath: localPath, photoHash: hash, isCompressed: compressionEnabled ?? true)
+                photos.append(photo)
+            }
+            os_log(.debug, log: OSLog.default, "Generated %d photos for view", photos.count)
+        } catch {
+            os_log(.error, log: OSLog.default, "Failed to generate photos")
+        }
+    }
+    
+
+    public func delete(photo: PSPhoto, index: Int) -> Bool{
+        guard let connected = connection?.isConnected() else {
+            self.start()
+            return false
+        }
+        os_log(.debug, log: OSLog.default, "Attempting to delete photo with hash %@ and name %@", photo.photoHash, photo.fileName)
+        let success = connection?.delete(photo: photo.photoHash) ?? false
+        if success {
+            os_log(.debug, log: OSLog.default, "Server deleted photo with hash %@", photo.photoHash)
+            let fileManager = FileManager.default
+            let fullPath = getDirectory(withName: "Library/Photos").appendingPathComponent(photo.fileName)
+            let thumbnailPath = getDirectory(withName: "Library/Thumbnails").appendingPathComponent(photo.fileName)
+            do {
+                
+                let appDelegate = AppDelegate.appDelegate
+                let context = appDelegate!.persistentContainer.viewContext
+                let entity = NSEntityDescription.entity(forEntityName: "Photos", in: context)
+                
+                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photos")
+                fetchRequest.fetchLimit = 1
+                fetchRequest.predicate = NSPredicate(format: "photohash == %@", photo.photoHash)
+                if let result = try? context.fetch(fetchRequest) {
+                    let resultData = result[0] as! NSManagedObject
+                    let name = resultData.value(forKey: "fileName") as? String
+                    print("Deleting core data with name: \(name)")
+                    context.delete(resultData)
+                    try fileManager.removeItem(at: fullPath)
+                    try fileManager.removeItem(at: thumbnailPath)
+                    
+                    print(photos[index].fileName)
+                    photos.remove(at: index)
+                    os_log(.debug, log: OSLog.default, "Client deleted photo with hash %@ and at index %d", photo.photoHash, index)
+                }
+                do {
+                    try context.save()
+                    
+                } catch {
+                    print("Failed saving")
+                }
+                return true
+            } catch {}
+        }
+        return false
+        
+    }
     
     public func sendPhoto(asset: PHAsset) {
         var rawData = Data()
@@ -194,49 +368,13 @@ class Photoshare {
         
     }
     
+
     
-    public func getSettings() -> ([String: Any]){
-        var settings = [String: Any]()
-        settings["hostName"] = getUserSetting(asStringfor: "hostName")
-        settings["port"] = getUserSetting(asIntFor: "port")
-        settings["userName"] = getUserSetting(asStringfor: "userName")
-        settings["password"] = getPassword()
-        
-        settings["allowSelfSignedCerts"] = getUserSetting(asBoolFor: "allowSelfSignedCerts")
-        settings["compressionEnabled"] = getUserSetting(asBoolFor: "compressionEnabled")
-        
-        return settings
-    }
     
-    //Ensure all settings are valid
-    //Read as value type and check if valid
-    //Toggles have two states dont need to check if its valid
-    public func settingsValid(with settings: ([String: Any])) -> Bool {
+    public func connect(withSettings settings: [String : Any]) throws -> NetworkConnection {
+        let settings = settings
         
-        for setting in settings {
-            guard let stringValue = setting.value as? String else {
-                guard let intValue = setting.value as? Int else {
-                    continue
-                }
-                if intValue == 0 {      //Port cant be 0
-                    return false
-                }
-                continue
-            }
-            if stringValue == "" {
-                return false
-            }
-            
-        }
-        return true
-    }
-    
-    public func connect() throws -> NetworkConnection {
-        let settings = getSettings()
         
-        if !settingsValid(with: settings)  {
-            throw PhotoshareError.invalidSettings
-        }
         compressionEnabled = settings["compressionEnabled"] as! Bool
         do {
             connection = try NetworkConnection(
@@ -378,3 +516,14 @@ class Photoshare {
     
     
 }
+
+
+
+//Logger
+struct Log {
+    static var general = OSLog(subsystem: "com.photoshare", category: "general")
+    static var file = OSLog(subsystem: "com.photoshare", category: "file")
+    static var network = OSLog(subsystem: "com.photoshare", category: "network")
+}
+
+

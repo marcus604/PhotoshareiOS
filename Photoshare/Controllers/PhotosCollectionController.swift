@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import os.log
 
 private let reuseIdentifier = "Cell"
 
@@ -46,15 +47,17 @@ class PhotosCollectionController: UICollectionViewController {
             }
         }
     }
-        
+    
+    
+    //First entry
     override func viewDidLoad() {
         super.viewDidLoad()
+        os_log(.debug, log: OSLog.default, "viewDidLoad: PhotosCollection")
+        photos = Photoshare.shared().getPhotos()
         
-        let settings = Photoshare.shared().getSettings()
         
-        
-        if Photoshare.shared().settingsValid(with: settings) {
-            DispatchQueue.global(qos: .userInitiated).async {
+        if Photoshare.shared().allSettingsValid {
+            DispatchQueue.global().async {
                 Photoshare.shared().start()
                 if Photoshare.shared().isConnected {
                     Photoshare.shared().sync()
@@ -65,34 +68,9 @@ class PhotosCollectionController: UICollectionViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(false)
+        os_log(.debug, log: OSLog.default, "viewWillAppear: PhotosCollection")
         self.navigationController?.setNavigationBarHidden(true, animated: false)
-        do {
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            let context = appDelegate.persistentContainer.viewContext
-            let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Photos")
-            let sortDescriptor = NSSortDescriptor(key: "timestamp", ascending: false)
-            request.sortDescriptors = [sortDescriptor]
-            do {
-                
-                let result = try context.fetch(request)
-                photos = [PSPhoto]()
-                for data in result as! [NSManagedObject] {
-                    let fileName = (data.value(forKey: "fileName") as! String)
-                    let thumbnailPath = getDirectory(withName: "Library/Thumbnails").appendingPathComponent(fileName)
-                    let localPath = getDirectory(withName: "Library/Photos").appendingPathComponent(fileName)
-                    let thumbnail = UIImage(data : try! Data(contentsOf: thumbnailPath))
-                    let hash = (data.value(forKey: "photohash") as! String)
-                    let photo = PSPhoto(fileName: fileName, thumbnail: thumbnail!, localPath: localPath, photoHash: hash, isCompressed: Photoshare.shared().compressionEnabled!)
-                    photos.append(photo)
-                }
-                
-            } catch {
-                
-                print("Failed")
-            }
-        } catch {
-            print(error)
-        }
+        photos = Photoshare.shared().getPhotos()
         collectionView?.reloadData()
     }
     
@@ -111,7 +89,8 @@ class PhotosCollectionController: UICollectionViewController {
 // MARK: - Private
 private extension PhotosCollectionController {
     func photoForIndexPath(indexPath: IndexPath) -> PSPhoto {
-        return photos[(indexPath as IndexPath).row]
+        let index = (indexPath as IndexPath).row
+        return photos[index]
     }
 }
 
@@ -157,6 +136,7 @@ extension PhotosCollectionController {
     
     override func collectionView(_ collectionView: UICollectionView,
                                  numberOfItemsInSection section: Int) -> Int {
+        os_log(.debug, log: OSLog.default, "Collection view has %d photos", photos.count)
         return photos.count
     }
     
@@ -168,14 +148,8 @@ extension PhotosCollectionController {
         
         let photo = photoForIndexPath(indexPath: indexPath)
     
-        
-        //Not viewing an individual photo, everything is a thumbnail
-        guard indexPath == fullSizePhotoIndexPath else {
-            cell.imageView.image = photo.thumbnail
-            photo.localPhoto = nil
-            photo.fullSizePhoto = nil
-            return cell
-        }
+        photo.loadThumbnailPhoto()
+        cell.imageView.image = photo.thumbnail
         
         
         return cell
@@ -184,16 +158,13 @@ extension PhotosCollectionController {
 
 extension PhotosCollectionController {
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("pressed")
         let viewController = storyboard?.instantiateViewController(withIdentifier: "PhotoDetailStoryboard") as? PhotoDetailViewController
         if let viewController = viewController {
             let photo = photoForIndexPath(indexPath: indexPath)
-            
+            photo.loadLocalPhoto()
+            viewController.photos = photos
             viewController.photo = photo
             viewController.indexPath = indexPath
-            viewController.image = photo.thumbnail
-            photo.loadLocalPhoto()
-            viewController.image = photo.localPhoto
             navigationController?.pushViewController(viewController, animated: true)
         }
     }
