@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import CoreData
 
 
 class PSPhoto {
@@ -31,6 +32,7 @@ class PSPhoto {
         self.isCompressed = isCompressed
     }
     
+   
     func loadThumbnailPhoto() {
         do {
             self.thumbnail = UIImage(data : try Data(contentsOf: self.thumbnailPath))

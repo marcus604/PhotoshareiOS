@@ -206,24 +206,24 @@ class NetworkConnection {
                     try image.write(to: fullPath)
                     var imageUIImage = UIImage(data: image)
                     let fullPath = getDirectory(withName: "Library/Thumbnails").appendingPathComponent(photoName)
-                    imageUIImage = resizeImage(image: imageUIImage!, newWidth: 200)
+                    imageUIImage = resizeImage(image: imageUIImage!, newWidth: 400)
                     if let data = imageUIImage!.jpegData(compressionQuality: 1) {
                         try? data.write(to: fullPath)
                     }
-                    DispatchQueue.main.async {
-                        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-                        let context = appDelegate.persistentContainer.viewContext
-                        let entity = NSEntityDescription.entity(forEntityName: "Photos", in: context)
-                        let newPhoto = NSManagedObject(entity: entity!, insertInto: context)
-                        newPhoto.setValue(photoName, forKey: "fileName")
-                        newPhoto.setValue(hashOfPhoto, forKey: "photohash")
-                        newPhoto.setValue(timeStampOfPhoto, forKey: "timestamp")
-                        do {
-                            try context.save()
-                        } catch {
-                            print("Failed saving")
-                        }
+                    
+                    let appDelegate = AppDelegate.appDelegate
+                    let context = appDelegate!.persistentContainer.viewContext
+                    let entity = NSEntityDescription.entity(forEntityName: "Photos", in: context)
+                    let newPhoto = NSManagedObject(entity: entity!, insertInto: context)
+                    newPhoto.setValue(photoName, forKey: "fileName")
+                    newPhoto.setValue(hashOfPhoto, forKey: "photohash")
+                    newPhoto.setValue(timeStampOfPhoto, forKey: "timestamp")
+                    do {
+                        try context.save()
+                    } catch {
+                        print("Failed saving")
                     }
+                    
                     
                 } catch {
                     print(error)

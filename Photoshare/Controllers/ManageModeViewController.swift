@@ -12,7 +12,9 @@ import os.log
 
 
 
-class ManageModeViewController: UIViewController, MGCardStackViewDelegate, MGCardStackViewDataSource{
+class ManageModeViewController: UIViewController, MGCardStackViewDelegate, MGCardStackViewDataSource, UIPickerViewDataSource, UIPickerViewDelegate{
+    
+    
     
     
 
@@ -20,9 +22,9 @@ class ManageModeViewController: UIViewController, MGCardStackViewDelegate, MGCar
     var photos: [PSPhoto]!
     var indexPath: IndexPath!
     var fullIndex: Int!
-    var photo: PSPhoto!
+    var currentPhoto: PSPhoto!
     var deleteWorkStack = DeleteWorkStack()
-    
+    private var deletedPhotos = 0
     
     
     @IBOutlet weak var cardStackView: MGCardStackView!
@@ -63,10 +65,32 @@ class ManageModeViewController: UIViewController, MGCardStackViewDelegate, MGCar
        
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        os_log(.debug, log: OSLog.default, "viewWillDissapear: ManageMode")
+        Photoshare.shared().generatePhotos()
+        Photoshare.shared().generateAlbums()
+    }
     
     @objc private func doneTapped() {
-        let viewController = storyboard?.instantiateViewController(withIdentifier: "PhotosCollectionController") as? PhotosCollectionController
-        if let viewController = viewController {
+        Photoshare.shared().generatePhotos()
+        Photoshare.shared().generateAlbums()
+        var viewControllerToLoad: UIViewController!
+        if let navController = self.navigationController, navController.viewControllers.count >= 4 {
+            print("number of navs  \(navController.viewControllers.count)")
+            for vc in navController.viewControllers {
+                print(vc)
+            }
+            let viewController = navController.viewControllers[navController.viewControllers.count - 4]
+            if viewController.isKind(of: AlbumCollectionViewController.self) {
+                viewControllerToLoad = storyboard?.instantiateViewController(withIdentifier: "AlbumCollectionViewController") as? AlbumCollectionViewController
+                viewControllerToLoad.navigationItem.hidesBackButton = true
+            }
+        } else {
+            viewControllerToLoad = storyboard?.instantiateViewController(withIdentifier: "PhotosCollectionController") as? PhotosCollectionController
+        }
+        
+        if let viewController = viewControllerToLoad {
             navigationController?.pushViewController(viewController, animated: true)
         }
     }
@@ -95,29 +119,121 @@ class ManageModeViewController: UIViewController, MGCardStackViewDelegate, MGCar
     //Waits 5 seconds before committing to delete
     //Gives user plenty of time to undo an accidental deletion
     func cardStack(_ cardStack: MGCardStackView, didSwipeCardAt index: Int, with direction: SwipeDirection) {
-        var currentFullIndex = self.fullIndex
+        //Photoshare.shared().formatPhotos()
+        let currentFullIndex = self.fullIndex
         self.fullIndex += 1
+        //print("Interacting with index:  \(currentFullIndex)")
+        currentPhoto = photos[index]
+        print(currentPhoto.fileName)
+        
         switch direction {
-            //Delete Photo
+
+            //DELETE PHOTO
             case SwipeDirection.left:
-                self.fullIndex -= 1     //If delete is successful than we're back one space
-                let photo = photos[index]
+                
+                
+                let photoToDelete = self.currentPhoto
                 let deletePhotoWorkItem = DispatchWorkItem {
+                    print("STARTING DISPATCH")
+                    print("Interacting with index:  \(currentFullIndex)")
+                    print(photoToDelete!.fileName)
                     if !Photoshare.shared().isConnected {
                         Photoshare.shared().start()
                     }
-                    let deleteResult = Photoshare.shared().delete(photo: photo, index: currentFullIndex!)
+                    let deleteResult = Photoshare.shared().delete(photo: photoToDelete!, index: currentFullIndex!)
+                    print("TABLE AFTER DELETE")
+                    //Photoshare.shared().formatPhotos()
                     self.deleteWorkStack.complete()
+                    
                 }
                 deleteWorkStack.push(deletePhotoWorkItem)
                 DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(5000),
                                                   execute: deletePhotoWorkItem)
+
+
+            //Add photo to album
             case SwipeDirection.up:
-                print("add to album")
+                presentAlbumPicker()
             default:    //Swipe is right, dont need to do anything
                 break
         }
+        
     }
+    
+    public func formatPhotos(photos: [PSPhoto]) {
+        var index = 0
+        for photo in photos {
+            print("Local Photo:   \(index) Name: \(photo.fileName) Hash: \(photo.photoHash)")
+            index += 1
+        }
+    }
+    
+    
+    
+    //Presents user with existing albums or option create a new album
+    //
+    func presentAlbumPicker(){
+        let alertController = UIAlertController(title: nil, message: "Select an Album", preferredStyle: .actionSheet)
+        
+        //Generate list of albums
+        for album in Photoshare.shared().getAlbums() {
+            let albumAction = UIAlertAction(title: album.title, style: .default, handler: { (action) in
+                if !Photoshare.shared().add(photo: self.currentPhoto, toAlbum: action.title!) {
+                    let alert = UIAlertController(title: "Error", message: "Photo already exists in album", preferredStyle: .alert)
+                    
+                    alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                    self.present(alert, animated: true)
+                    
+                }
+                Photoshare.shared().generateAlbums()
+            })
+            alertController.addAction(albumAction)
+        }
+        
+        //Create new album
+        let createNewAlbumActionSheet = UIAlertAction(title: "New Album", style: .destructive) { (action) in
+            
+            
+            let requestAlbumAlert = UIAlertController(title: "Album Name", message: nil, preferredStyle: .alert)
+            requestAlbumAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+            
+            //Only enabled text field if there is text
+            requestAlbumAlert.addTextField(configurationHandler: { textField in
+                textField.addTarget(self, action: #selector(self.textChanged(_:)), for: UIControl.Event.editingChanged)
+            })
+            
+            
+            let okButton = UIAlertAction(title: "OK", style: .default, handler: { action in
+                if let name = requestAlbumAlert.textFields?.first?.text {
+                    if !Photoshare.shared().createNewAlbum(withName: name, userCreated: true) {       //Photos generated through UI will always be user created
+                        let alert = UIAlertController(title: "Album already exists", message: "Photo has been added", preferredStyle: .alert)
+                       
+                        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                        
+                        self.present(alert, animated: true)
+                    }
+                    Photoshare.shared().add(photo: self.currentPhoto, toAlbum: name)
+                    Photoshare.shared().generateAlbums()
+                }
+            })
+            okButton.isEnabled = false  //Dont enable button until there is text
+            
+            requestAlbumAlert.addAction(okButton)
+            
+            self.present(requestAlbumAlert, animated: true)
+        }
+        
+        
+        alertController.addAction(createNewAlbumActionSheet)
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (action) in
+            //No required action
+        }
+        alertController.addAction(cancelAction)
+        self.present(alertController, animated: true)
+    }
+    
+  
     
     
     //Undo
@@ -126,6 +242,7 @@ class ManageModeViewController: UIViewController, MGCardStackViewDelegate, MGCar
         if direction == SwipeDirection.left {   //If deleted
             if !deleteWorkStack.isEmpty {
                 deleteWorkStack.pop()!.cancel()
+                fullIndex += 1
                 os_log(.debug, log: OSLog.default, "Cancelled Deletion of Photo")
             } else {
                 os_log(.debug, log: OSLog.default, "Delete already processed")
@@ -133,6 +250,8 @@ class ManageModeViewController: UIViewController, MGCardStackViewDelegate, MGCar
         }//Adding to album is 2 presses, less accident prone
         
     }
+    
+    
     
     func additionalOptions(_ cardStack: MGCardStackView) -> MGCardStackViewOptions {
         let options = MGCardStackViewOptions()
@@ -163,7 +282,23 @@ class ManageModeViewController: UIViewController, MGCardStackViewDelegate, MGCar
         let path = getDocumentsDirectory().appendingPathComponent(name, isDirectory: true)
         return path
     }
+    
+    //UIPicker Datasource
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
 
+    //UIPicker Delegate
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return 3
+    }
+    
+    @objc func textChanged(_ sender:UITextField) {
+        let alertController:UIAlertController = self.presentedViewController as! UIAlertController
+        let textField :UITextField  = alertController.textFields![0]
+        let okAction: UIAlertAction = alertController.actions[1]
+        okAction.isEnabled = (textField.text?.count != 0)
+    }
 }
 
 struct DeleteWorkStack {

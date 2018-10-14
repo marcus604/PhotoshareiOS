@@ -18,8 +18,8 @@ class PhotosCollectionController: UICollectionViewController {
     fileprivate let reuseIdentifier = "PhotoCell"
     fileprivate let sectionInsets = UIEdgeInsets(top: 1.0, left: 1.0, bottom: 1.0, right: 1.0)
 
-    //fileprivate var months = [Date]()
-    fileprivate var photos = [PSPhoto]()
+    
+    public var photos = [PSPhoto]()
     
     fileprivate let itemsPerRow: CGFloat = 4
     
@@ -53,7 +53,9 @@ class PhotosCollectionController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         os_log(.debug, log: OSLog.default, "viewDidLoad: PhotosCollection")
-        photos = Photoshare.shared().getPhotos()
+        if photos.count == 0 {
+            photos = Photoshare.shared().getPhotos()
+        }
         
         
         if Photoshare.shared().allSettingsValid {
@@ -70,7 +72,10 @@ class PhotosCollectionController: UICollectionViewController {
         super.viewWillAppear(false)
         os_log(.debug, log: OSLog.default, "viewWillAppear: PhotosCollection")
         self.navigationController?.setNavigationBarHidden(true, animated: false)
-        photos = Photoshare.shared().getPhotos()
+        if photos.count == 0 {
+            photos = Photoshare.shared().getPhotos()
+        }
+        
         collectionView?.reloadData()
     }
     
@@ -156,6 +161,8 @@ extension PhotosCollectionController {
     }
 }
 
+
+//Photo Selected
 extension PhotosCollectionController {
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let viewController = storyboard?.instantiateViewController(withIdentifier: "PhotoDetailStoryboard") as? PhotoDetailViewController

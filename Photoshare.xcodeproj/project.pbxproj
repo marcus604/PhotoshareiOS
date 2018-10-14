@@ -9,8 +9,11 @@
 /* Begin PBXBuildFile section */
 		2C11B770213E5BE600C6A374 /* SwiftKeychainWrapper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C11B76F213E5BE600C6A374 /* SwiftKeychainWrapper.framework */; };
 		2C11B772213E5BFE00C6A374 /* SwiftKeychainWrapper.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2C11B771213E5BFE00C6A374 /* SwiftKeychainWrapper.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		2C1B6A372171C5B1006D9050 /* AlbumCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1B6A362171C5B1006D9050 /* AlbumCollectionViewController.swift */; };
+		2C1B6A392171C610006D9050 /* PhotoAlbum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1B6A382171C610006D9050 /* PhotoAlbum.swift */; };
 		2C41EC8C216FE86E002C14F6 /* ManageModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C41EC8B216FE86E002C14F6 /* ManageModeViewController.swift */; };
 		2C4C63E2216E71AA00F783AD /* PhotoDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4C63E1216E71AA00F783AD /* PhotoDetailViewController.swift */; };
+		2C590ED82172F984001684B5 /* AlbumCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C590ED72172F984001684B5 /* AlbumCell.swift */; };
 		2C65268E21260575006EF3BA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C65268D21260575006EF3BA /* AppDelegate.swift */; };
 		2C65269321260575006EF3BA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C65269121260575006EF3BA /* Main.storyboard */; };
 		2C65269521260576006EF3BA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2C65269421260576006EF3BA /* Assets.xcassets */; };
@@ -66,8 +69,11 @@
 /* Begin PBXFileReference section */
 		2C11B76F213E5BE600C6A374 /* SwiftKeychainWrapper.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftKeychainWrapper.framework; path = Carthage/Build/iOS/SwiftKeychainWrapper.framework; sourceTree = "<group>"; };
 		2C11B771213E5BFE00C6A374 /* SwiftKeychainWrapper.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftKeychainWrapper.framework; path = Carthage/Build/iOS/SwiftKeychainWrapper.framework; sourceTree = "<group>"; };
+		2C1B6A362171C5B1006D9050 /* AlbumCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumCollectionViewController.swift; sourceTree = "<group>"; };
+		2C1B6A382171C610006D9050 /* PhotoAlbum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAlbum.swift; sourceTree = "<group>"; };
 		2C41EC8B216FE86E002C14F6 /* ManageModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageModeViewController.swift; sourceTree = "<group>"; };
 		2C4C63E1216E71AA00F783AD /* PhotoDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoDetailViewController.swift; sourceTree = "<group>"; };
+		2C590ED72172F984001684B5 /* AlbumCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumCell.swift; sourceTree = "<group>"; };
 		2C65268A21260575006EF3BA /* Photoshare.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Photoshare.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C65268D21260575006EF3BA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2C65269221260575006EF3BA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -260,9 +266,11 @@
 			isa = PBXGroup;
 			children = (
 				2C88271B21657B0B007DC1DB /* PhotoCell.swift */,
+				2C590ED72172F984001684B5 /* AlbumCell.swift */,
 				2C88273D2165C572007DC1DB /* SettingsViewController.swift */,
 				2C88271921657368007DC1DB /* PhotosCollectionController.swift */,
 				2C4C63E1216E71AA00F783AD /* PhotoDetailViewController.swift */,
+				2C1B6A362171C5B1006D9050 /* AlbumCollectionViewController.swift */,
 				2C41EC8B216FE86E002C14F6 /* ManageModeViewController.swift */,
 				2CB1AC2D21702CA10060BB78 /* ManageModeSwipeCard.swift */,
 			);
@@ -277,6 +285,7 @@
 				2C6526B12126150C006EF3BA /* PSMessage.swift */,
 				2C6526AD21260B54006EF3BA /* NetworkConnection.swift */,
 				2C88273F2165D4E8007DC1DB /* UserSettings.swift */,
+				2C1B6A382171C610006D9050 /* PhotoAlbum.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -387,12 +396,15 @@
 				2CB1ABF62170214F0060BB78 /* MGCardStackViewOptions.swift in Sources */,
 				2CB1ABF52170214F0060BB78 /* MGCardStackViewDelegate.swift in Sources */,
 				2CB1ABFA2170214F0060BB78 /* SwipeDirection.swift in Sources */,
+				2C590ED82172F984001684B5 /* AlbumCell.swift in Sources */,
 				2CB1ABFE2170214F0060BB78 /* UIView+Anchor.swift in Sources */,
 				2CB1ABFB2170214F0060BB78 /* MGSwipeView.swift in Sources */,
 				2C6526AE21260B54006EF3BA /* NetworkConnection.swift in Sources */,
 				2CB1ABFD2170214F0060BB78 /* Array+Shift.swift in Sources */,
+				2C1B6A392171C610006D9050 /* PhotoAlbum.swift in Sources */,
 				2C88273E2165C572007DC1DB /* SettingsViewController.swift in Sources */,
 				2C88271C21657B0B007DC1DB /* PhotoCell.swift in Sources */,
+				2C1B6A372171C5B1006D9050 /* AlbumCollectionViewController.swift in Sources */,
 				2C65268E21260575006EF3BA /* AppDelegate.swift in Sources */,
 				2C4C63E2216E71AA00F783AD /* PhotoDetailViewController.swift in Sources */,
 				2CB1ABF92170214F0060BB78 /* MGSwipeCard.swift in Sources */,

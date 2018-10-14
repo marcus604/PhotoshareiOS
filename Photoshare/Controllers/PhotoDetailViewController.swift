@@ -96,7 +96,7 @@ class PhotoDetailViewController: UIViewController, UIScrollViewDelegate, CropVie
         viewController!.indexPath = self.indexPath
         let photosAfterIndex = photos[indexPath[1]...]
         viewController!.photos = Array(photosAfterIndex)
-        viewController!.photo = self.photo
+        viewController!.currentPhoto = self.photo
         navigationController?.pushViewController(viewController!, animated: true)
     }
     

@@ -390,11 +390,65 @@
                     <connections>
                         <segue destination="Ati-8S-peo" kind="relationship" relationship="viewControllers" id="RHQ-b0-EZf"/>
                         <segue destination="9oF-97-s4S" kind="relationship" relationship="viewControllers" id="Cvc-CI-pC3"/>
+                        <segue destination="hwh-Md-vhx" kind="relationship" relationship="viewControllers" id="UU3-3M-6j9"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QbQ-Dr-0Ra" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2026.4000000000001" y="469.1154422788606"/>
+        </scene>
+        <!--Album Collection View Controller-->
+        <scene sceneID="My5-dT-QdV">
+            <objects>
+                <collectionViewController storyboardIdentifier="AlbumCollectionViewController" id="AhN-MU-ybg" customClass="AlbumCollectionViewController" customModule="Photoshare" customModuleProvider="target" sceneMemberID="viewController">
+                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="evm-wn-Tpo">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="FyV-jp-Vic">
+                            <size key="itemSize" width="200" height="200"/>
+                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                            <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                            <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                        </collectionViewFlowLayout>
+                        <cells>
+                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="AlbumCell" id="Hid-mq-wpx" customClass="AlbumCell" customModule="Photoshare" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="200" height="200"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
+                                    <rect key="frame" x="0.0" y="0.0" width="200" height="200"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9JN-Cm-8z6">
+                                            <rect key="frame" x="0.0" y="0.0" width="200" height="200"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        </imageView>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Utah 2016" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bTZ-2Y-WPz">
+                                            <rect key="frame" x="0.0" y="0.0" width="200" height="200"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <nil key="highlightedColor"/>
+                                            <color key="shadowColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </label>
+                                    </subviews>
+                                </view>
+                                <connections>
+                                    <outlet property="albumNameLabel" destination="bTZ-2Y-WPz" id="GRK-PS-PaU"/>
+                                    <outlet property="imageView" destination="9JN-Cm-8z6" id="zvE-t4-CFS"/>
+                                </connections>
+                            </collectionViewCell>
+                        </cells>
+                        <connections>
+                            <outlet property="dataSource" destination="AhN-MU-ybg" id="8S4-kl-x6h"/>
+                            <outlet property="delegate" destination="AhN-MU-ybg" id="cEd-EH-2C7"/>
+                        </connections>
+                    </collectionView>
+                    <navigationItem key="navigationItem" id="XCE-pw-Tor"/>
+                </collectionViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="tcH-Jy-fhk" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4469.5652173913049" y="-529.07608695652175"/>
         </scene>
         <!--Photos-->
         <scene sceneID="yxF-Gr-xg3">
@@ -439,7 +493,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ROM-JH-uOg" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="6394.202898550725" y="-539.67391304347825"/>
+            <point key="canvasLocation" x="7301.449275362319" y="-539.67391304347825"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="REg-3L-N9e">
@@ -475,7 +529,26 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ZBw-Gh-dWw" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5486.9565217391309" y="-539.67391304347825"/>
+            <point key="canvasLocation" x="6394.202898550725" y="-539.67391304347825"/>
+        </scene>
+        <!--Albums-->
+        <scene sceneID="c5j-2R-8y6">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="hwh-Md-vhx" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Albums" id="adX-Uz-HLa"/>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="RDg-tr-6uV">
+                        <rect key="frame" x="0.0" y="20" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="AhN-MU-ybg" kind="relationship" relationship="rootViewController" id="yyQ-GE-q8i"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="CA5-5a-WLQ" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3562.3188405797105" y="-529.07608695652175"/>
         </scene>
     </scenes>
 </document>

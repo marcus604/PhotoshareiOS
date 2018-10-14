@@ -19,6 +19,8 @@ class Photoshare {
     private var changedPhotos: [String]? //Need to create a class/struct for photo class
     
     private var photos: [PSPhoto]!
+    private var albums: [PSAlbum]!
+    private var globalIndex: Int!
     
     //Settings
     public var compressionEnabled: Bool?
@@ -61,6 +63,7 @@ class Photoshare {
         let photoshare = Photoshare()
         photoshare.validateSettings()
         photoshare.generatePhotos()
+        photoshare.generateAlbums()
         if photoshare.photos.count == 0{    //If no photos then directories might not. Silent return if directory creation fails
             photoshare.createDirectory(withName: "Library/Photos/")
             photoshare.createDirectory(withName: "Library/Thumbnails/")
@@ -173,6 +176,10 @@ class Photoshare {
         return photos
     }
     
+    public func getAlbums() -> [PSAlbum] {
+        return albums
+    }
+    
    
     public func sync() {
         var numOfPhotosSynced = 0
@@ -241,7 +248,130 @@ class Photoshare {
 
     }
     
-    private func generatePhotos() {
+    
+    public func createNewAlbum(withName name: String, userCreated: Bool) -> Bool{
+        let appDelegate = AppDelegate.appDelegate
+        let context = appDelegate!.persistentContainer.viewContext
+        
+        let albumEntity = NSEntityDescription.entity(forEntityName: "Albums", in: context)
+        var fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Albums")
+        fetchRequest.fetchLimit = 1
+        fetchRequest.predicate = NSPredicate(format: "name == %@", name)
+        if let result = try? context.fetch(fetchRequest) {
+            if result.count == 1 {
+                os_log(.error, log: OSLog.default, "Album already exists")
+                return false
+            }
+            
+        }
+        
+        let newAlbum = NSManagedObject(entity: albumEntity!, insertInto: context)
+        
+        newAlbum.setValue(name, forKey: "name")
+        newAlbum.setValue(compressionEnabled, forKey: "isCompressed")
+        newAlbum.setValue(Date(), forKey: "dateCreated")
+        newAlbum.setValue(Date(), forKey: "dateUpdated")
+        newAlbum.setValue(userCreated, forKey: "userCreated")
+        
+        
+        do {
+            try context.save()
+        } catch {
+            os_log(.error, log: OSLog.default, "Failed to create album")
+            return false
+        }
+        os_log(.debug, log: OSLog.default, "Created Album: %@", name)
+        generateAlbums()
+        return true
+    }
+    
+    public func add(photo: PSPhoto, toAlbum album: String) -> Bool{
+            
+        var albumObject: NSManagedObject!
+        var photoObject: NSManagedObject!
+        
+        let appDelegate = AppDelegate.appDelegate
+        let context = appDelegate!.persistentContainer.viewContext
+        let albumEntity = NSEntityDescription.entity(forEntityName: "Albums", in: context)
+        let photoEntity = NSEntityDescription.entity(forEntityName: "Photos", in: context)
+        var fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Albums")
+        fetchRequest.fetchLimit = 1
+        fetchRequest.predicate = NSPredicate(format: "name == %@", album)
+        if let result = try? context.fetch(fetchRequest) {
+            albumObject = result[0] as! NSManagedObject
+        }
+        
+        fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photos")
+        fetchRequest.fetchLimit = 1
+        fetchRequest.predicate = NSPredicate(format: "photohash == %@", photo.photoHash)
+        if let result = try? context.fetch(fetchRequest) {
+            photoObject = result[0] as! NSManagedObject
+        }
+        let albumPhotos = albumObject.mutableSetValue(forKey: "photos")
+        
+        //Determine if photo already contained in album
+        for photoInAlbum in albumPhotos {
+            let hash = (photoInAlbum as AnyObject).value(forKey: "photohash") as! String
+            if hash == photo.photoHash {
+                os_log(.info, log: OSLog.default, "Photo already in album")
+                return false
+            }
+        }
+        albumPhotos.add(photoObject)
+        albumObject.setValue(Date(), forKey: "dateUpdated")
+        
+        do {
+            try context.save()
+            os_log(.debug, log: OSLog.default, "Added photo to album: %@", album)
+            
+        } catch {
+            os_log(.error, log: OSLog.default, "Failed to add photo to album")
+            return false
+        }
+        return true
+        
+    }
+    
+    public func generateAlbums() {
+        let appDelegate = AppDelegate.appDelegate
+        let context = appDelegate!.persistentContainer.viewContext
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Albums")
+        let sortDescriptor = NSSortDescriptor(key: "dateUpdated", ascending: false)
+        request.sortDescriptors = [sortDescriptor]
+        do {
+            albums = [PSAlbum]()
+            let result = try context.fetch(request)
+            for data in result as! [NSManagedObject] {
+                let albumName = (data.value(forKey: "name") as! String)
+                let isCompressed = (data.value(forKey: "isCompressed") as! Bool)
+                let lastUpdated = (data.value(forKey: "dateUpdated") as! Date)
+                let userCreated = (data.value(forKey: "userCreated") as! Bool)
+                
+                var photos = [PSPhoto]()
+                let albumPhotos = data.mutableSetValue(forKey: "photos")
+                
+                for photoObject in albumPhotos {
+                    let photoInAlbum = photoObject as AnyObject
+                    let fileName = (photoInAlbum.value(forKey: "fileName") as! String)
+                    let thumbnailPath = getDirectory(withName: "Library/Thumbnails").appendingPathComponent(fileName)
+                    let localPath = getDirectory(withName: "Library/Photos").appendingPathComponent(fileName)
+                    let hash = (photoInAlbum.value(forKey: "photohash") as! String)
+                    let compressionEnabled = settings["compressionEnabled"] as? Bool
+                    let photo = PSPhoto(fileName: fileName, thumbnailPath: thumbnailPath, localPath: localPath, photoHash: hash, isCompressed: compressionEnabled ?? true)
+                    photos.append(photo)
+                    
+                }
+        
+                let album = PSAlbum(title: albumName, isCompressed: isCompressed, lastUpdated: lastUpdated, userCreated: userCreated, photos: photos)
+                albums.append(album)
+            }
+            os_log(.debug, log: OSLog.default, "Generated %d albums for view", albums.count)
+        } catch {
+            os_log(.error, log: OSLog.default, "Failed to generate albums")
+        }
+    }
+
+    public func generatePhotos() {
         let appDelegate = AppDelegate.appDelegate
         let context = appDelegate!.persistentContainer.viewContext
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Photos")
@@ -254,7 +384,6 @@ class Photoshare {
                 let fileName = (data.value(forKey: "fileName") as! String)
                 let thumbnailPath = getDirectory(withName: "Library/Thumbnails").appendingPathComponent(fileName)
                 let localPath = getDirectory(withName: "Library/Photos").appendingPathComponent(fileName)
-                //let thumbnail = UIImage(data : try! Data(contentsOf: thumbnailPath))
                 let hash = (data.value(forKey: "photohash") as! String)
                 let compressionEnabled = settings["compressionEnabled"] as? Bool
                 let photo = PSPhoto(fileName: fileName, thumbnailPath: thumbnailPath, localPath: localPath, photoHash: hash, isCompressed: compressionEnabled ?? true)
@@ -263,6 +392,14 @@ class Photoshare {
             os_log(.debug, log: OSLog.default, "Generated %d photos for view", photos.count)
         } catch {
             os_log(.error, log: OSLog.default, "Failed to generate photos")
+        }
+    }
+    
+    public func formatPhotos() {
+        var index = 0
+        for photo in photos {
+            print("Global Photo:   \(index) Name: \(photo.fileName) Hash: \(photo.photoHash)")
+            index += 1
         }
     }
     
@@ -296,8 +433,9 @@ class Photoshare {
                     try fileManager.removeItem(at: fullPath)
                     try fileManager.removeItem(at: thumbnailPath)
                     
-                    print(photos[index].fileName)
-                    photos.remove(at: index)
+                   
+                    //print(photos[index].fileName)
+                    //photos.remove(at: index)
                     os_log(.debug, log: OSLog.default, "Client deleted photo with hash %@ and at index %d", photo.photoHash, index)
                 }
                 do {
