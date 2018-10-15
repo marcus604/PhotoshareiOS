@@ -36,6 +36,8 @@ class NetworkConnection {
     private var currentlyReceiving = false
     
     private let INSTRUCTION_SYNC = 1
+    private let INSTRUCTION_CREATE_ALBUM = 40
+    private let INSTRUCTION_ADD_TO_ALBUM = 45
     private let INSTRUCTION_DELETE = 50
     
    
@@ -201,7 +203,6 @@ class NetworkConnection {
                 
                 let fullPath = getDirectory(withName: "Library/Photos").appendingPathComponent(photoName)
 
-                let size = image.count
                 do {
                     try image.write(to: fullPath)
                     var imageUIImage = UIImage(data: image)
@@ -250,6 +251,43 @@ class NetworkConnection {
         
     }
     
+    //Provide server with working album
+    //Request photo be added to working album
+    func add(photo hash: String, toAlbum album: String) -> Bool {
+        let addToAlbumMsg = PSMessage(endian: endian, version: version, instruction: INSTRUCTION_ADD_TO_ALBUM , data: album, token: token)
+        let addPhotoAlbumMsg = PSMessage(endian: endian, version: version, instruction: INSTRUCTION_ADD_TO_ALBUM , data: hash, token: token)
+        do {
+            try send(msg: addToAlbumMsg)
+            try send(msg: addPhotoAlbumMsg)
+            try socket.setReadTimeout(value: 10000)
+            let addPhotoToAlbumMsg = try receiveMessage()
+            try socket.setReadTimeout(value: 1000)
+            let result = addPhotoToAlbumMsg.getData()
+            if result == "0" {
+                return true
+            }
+            
+        } catch {}
+        return false
+    }
+    
+    func createAlbum(album: PSAlbum) -> Bool {
+        let createAlbumMsg = PSMessage(endian: endian, version: version, instruction: INSTRUCTION_CREATE_ALBUM, data: album.title, token: token)
+        let userCreatedString = (album.userCreated ? "1" : "0")
+        let userCreatedMsg = PSMessage(endian: endian, version: version, instruction: INSTRUCTION_CREATE_ALBUM, data: userCreatedString, token: token)
+        do {
+            try send(msg: createAlbumMsg)
+            try send(msg: userCreatedMsg)
+            try socket.setReadTimeout(value: 10000)
+            let createAlbumResultMsg = try receiveMessage()
+            try socket.setReadTimeout(value: 1000)
+            let result = createAlbumResultMsg.getData()
+            if result == "0" {
+                return true
+            }
+        } catch {}
+        return false
+    }
     
     func delete(photo hash: String) -> Bool{
         let deleteMsg = PSMessage(endian: endian, version: version, instruction: INSTRUCTION_DELETE, data: hash, token: token)

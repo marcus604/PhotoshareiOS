@@ -18,6 +18,9 @@ class PhotosCollectionController: UICollectionViewController {
     fileprivate let reuseIdentifier = "PhotoCell"
     fileprivate let sectionInsets = UIEdgeInsets(top: 1.0, left: 1.0, bottom: 1.0, right: 1.0)
 
+    private let refreshControl = UIRefreshControl()
+    
+    @IBOutlet weak var activityIndicatorView: UIActivityIndicatorView!
     
     public var photos = [PSPhoto]()
     
@@ -57,6 +60,11 @@ class PhotosCollectionController: UICollectionViewController {
             photos = Photoshare.shared().getPhotos()
         }
         
+        collectionView?.refreshControl = refreshControl
+        setupActivityIndicatorView()
+        
+        // Configure Refresh Control
+        refreshControl.addTarget(self, action: #selector(refreshPhotoLibraryData(_:)), for: .valueChanged)
         
         if Photoshare.shared().allSettingsValid {
             DispatchQueue.global().async {
@@ -68,6 +76,29 @@ class PhotosCollectionController: UICollectionViewController {
         }
     }
     
+    @objc private func refreshPhotoLibraryData(_ sender: Any) {
+        fetchPhotoLibraryData()
+    }
+    
+    private func fetchPhotoLibraryData() {
+        let loadPhotoLibraryWorkItem = DispatchWorkItem {
+            if !Photoshare.shared().isConnected {
+                Photoshare.shared().start()
+            }
+            Photoshare.shared().generatePhotos()
+            Photoshare.shared().generateAlbums()
+            self.photos = Photoshare.shared().getPhotos()
+            DispatchQueue.main.async {
+                self.collectionView?.reloadData()
+                self.refreshControl.endRefreshing()
+                self.activityIndicatorView.stopAnimating()
+            }
+        }
+        
+        
+        DispatchQueue.global(qos: .utility).async(execute: loadPhotoLibraryWorkItem)
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(false)
         os_log(.debug, log: OSLog.default, "viewWillAppear: PhotosCollection")
@@ -77,6 +108,10 @@ class PhotosCollectionController: UICollectionViewController {
         }
         
         collectionView?.reloadData()
+    }
+    
+    private func setupActivityIndicatorView() {
+        //activityIndicatorView.startAnimating()
     }
     
     func getDocumentsDirectory() -> URL {

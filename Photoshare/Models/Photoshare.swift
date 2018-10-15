@@ -262,27 +262,34 @@ class Photoshare {
                 os_log(.error, log: OSLog.default, "Album already exists")
                 return false
             }
+        }
+        
+        //Request server to create album
+        //Create local if server successfull
+        let album = PSAlbum(title: name, isCompressed: compressionEnabled!, lastUpdated: Date(), userCreated: userCreated)
+        let success = connection?.createAlbum(album: album) ?? false
+        if success {
+            let newAlbum = NSManagedObject(entity: albumEntity!, insertInto: context)
             
+            newAlbum.setValue(name, forKey: "name")
+            newAlbum.setValue(compressionEnabled, forKey: "isCompressed")
+            newAlbum.setValue(Date(), forKey: "dateCreated")
+            newAlbum.setValue(Date(), forKey: "dateUpdated")
+            newAlbum.setValue(userCreated, forKey: "userCreated")
+            
+            do {
+                try context.save()
+                os_log(.debug, log: OSLog.default, "Created Album: %@", name)
+                generateAlbums()
+                return true
+            } catch {
+                os_log(.error, log: OSLog.default, "Failed to create album")
+                return false
+            }
         }
         
-        let newAlbum = NSManagedObject(entity: albumEntity!, insertInto: context)
-        
-        newAlbum.setValue(name, forKey: "name")
-        newAlbum.setValue(compressionEnabled, forKey: "isCompressed")
-        newAlbum.setValue(Date(), forKey: "dateCreated")
-        newAlbum.setValue(Date(), forKey: "dateUpdated")
-        newAlbum.setValue(userCreated, forKey: "userCreated")
-        
-        
-        do {
-            try context.save()
-        } catch {
-            os_log(.error, log: OSLog.default, "Failed to create album")
-            return false
-        }
-        os_log(.debug, log: OSLog.default, "Created Album: %@", name)
-        generateAlbums()
-        return true
+        os_log(.error, log: OSLog.default, "Server failed to create album")
+        return false
     }
     
     public func add(photo: PSPhoto, toAlbum album: String) -> Bool{
@@ -300,7 +307,8 @@ class Photoshare {
         if let result = try? context.fetch(fetchRequest) {
             albumObject = result[0] as! NSManagedObject
         }
-        
+        let success = connection?.add(photo: photo.photoHash, toAlbum: album) ?? false
+       
         fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photos")
         fetchRequest.fetchLimit = 1
         fetchRequest.predicate = NSPredicate(format: "photohash == %@", photo.photoHash)

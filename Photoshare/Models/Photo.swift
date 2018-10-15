@@ -12,15 +12,15 @@ import CoreData
 
 
 class PSPhoto {
-    var fullSizePhoto : UIImage?
-    var localPhoto : UIImage?
-    var thumbnail : UIImage?
-    var fullSizePath : URL?
-    var localPath : URL
-    var thumbnailPath : URL
-    var fileName : String
-    var photoHash : String
-    var isCompressed : Bool
+    public var fullSizePhoto : UIImage?
+    public var localPhoto : UIImage?
+    public var thumbnail : UIImage?
+    public var fullSizePath : URL?
+    public var localPath : URL
+    public var thumbnailPath : URL
+    public var fileName : String
+    public var photoHash : String
+    public var isCompressed : Bool
     
     
     
@@ -33,7 +33,7 @@ class PSPhoto {
     }
     
    
-    func loadThumbnailPhoto() {
+    public func loadThumbnailPhoto() {
         do {
             self.thumbnail = UIImage(data : try Data(contentsOf: self.thumbnailPath))
         } catch {
@@ -42,7 +42,7 @@ class PSPhoto {
         
     }
    
-    func loadLocalPhoto() {
+    public func loadLocalPhoto() {
         do {
             self.localPhoto = UIImage(data : try Data(contentsOf: self.localPath))
         } catch {
@@ -50,7 +50,7 @@ class PSPhoto {
         }
     }
     
-    func loadFullSizePhoto() {
+    public func loadFullSizePhoto() {
         Photoshare.shared().getFullSizeImage(forPhoto: self)
     }
     
@@ -63,7 +63,7 @@ class PSPhoto {
         return
     }
     
-    func loadfullSizePhoto(_ completion: @escaping (_ photo: PSPhoto, _ error: NSError?) -> Void) {
+    public func loadfullSizePhoto(_ completion: @escaping (_ photo: PSPhoto, _ error: NSError?) -> Void) {
         
         Photoshare.shared().getFullSizeImage(forPhoto: self)
         DispatchQueue.main.async {
@@ -73,7 +73,7 @@ class PSPhoto {
     }
     
     
-    func sizeToFillWidthOfSize(_ size:CGSize) -> CGSize {
+    public func sizeToFillWidthOfSize(_ size:CGSize) -> CGSize {
         
         guard let thumbnail = thumbnail else {
             return size

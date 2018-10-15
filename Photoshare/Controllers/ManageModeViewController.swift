@@ -85,6 +85,8 @@ class ManageModeViewController: UIViewController, MGCardStackViewDelegate, MGCar
             if viewController.isKind(of: AlbumCollectionViewController.self) {
                 viewControllerToLoad = storyboard?.instantiateViewController(withIdentifier: "AlbumCollectionViewController") as? AlbumCollectionViewController
                 viewControllerToLoad.navigationItem.hidesBackButton = true
+            } else {
+                viewControllerToLoad = storyboard?.instantiateViewController(withIdentifier: "PhotosCollectionController") as? PhotosCollectionController
             }
         } else {
             viewControllerToLoad = storyboard?.instantiateViewController(withIdentifier: "PhotosCollectionController") as? PhotosCollectionController

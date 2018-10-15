@@ -95,8 +95,10 @@ class AlbumCollectionViewController: UICollectionViewController, UICollectionVie
         
         let album = albumForIndexPath(indexPath: indexPath)
         
+        //If album is blank, only show the text
         if album.photos.count == 0 {
             cell.albumNameLabel.text = album.title
+            cell.imageView.image = nil
             return cell
         }
         album.loadCoverPhoto()
@@ -130,13 +132,15 @@ class AlbumCollectionViewController: UICollectionViewController, UICollectionVie
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let album = albumForIndexPath(indexPath: indexPath)
+        if album.photos.count == 0 {
+            return  //Cant open empty album
+        }
         let viewController = storyboard?.instantiateViewController(withIdentifier: "PhotosCollectionController") as? PhotosCollectionController
                
         if let viewController = viewController {
             let album = albumForIndexPath(indexPath: indexPath)
+            viewController.collectionView?.refreshControl = nil     //Dont allow pull down to refresh in album view
             viewController.photos = album.photos
-            //viewController.navigationController?.setNavigationBarHidden(false, animated: false)
-            //viewController.indexPath = indexPath GO TO SPOT
             navigationController?.pushViewController(viewController, animated: true)
         }
     }
