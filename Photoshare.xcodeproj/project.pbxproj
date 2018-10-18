@@ -28,7 +28,6 @@
 		2C88271C21657B0B007DC1DB /* PhotoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C88271B21657B0B007DC1DB /* PhotoCell.swift */; };
 		2C88271E21657C7E007DC1DB /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C88271D21657C7E007DC1DB /* Photo.swift */; };
 		2C88273E2165C572007DC1DB /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C88273D2165C572007DC1DB /* SettingsViewController.swift */; };
-		2C8827402165D4E8007DC1DB /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C88273F2165D4E8007DC1DB /* UserSettings.swift */; };
 		2CA2FACC216F250B003D4058 /* PhotoCropEditor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CA2FACB216F250B003D4058 /* PhotoCropEditor.framework */; };
 		2CA2FACE216F2528003D4058 /* PhotoCropEditor.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2CA2FACD216F2528003D4058 /* PhotoCropEditor.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2CB1ABF42170214F0060BB78 /* CardStackAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CB1ABE42170214F0060BB78 /* CardStackAnimator.swift */; };
@@ -91,7 +90,6 @@
 		2C88271B21657B0B007DC1DB /* PhotoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCell.swift; sourceTree = "<group>"; };
 		2C88271D21657C7E007DC1DB /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
 		2C88273D2165C572007DC1DB /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
-		2C88273F2165D4E8007DC1DB /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
 		2CA2FACB216F250B003D4058 /* PhotoCropEditor.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhotoCropEditor.framework; path = Carthage/Build/iOS/PhotoCropEditor.framework; sourceTree = "<group>"; };
 		2CA2FACD216F2528003D4058 /* PhotoCropEditor.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhotoCropEditor.framework; path = Carthage/Build/iOS/PhotoCropEditor.framework; sourceTree = "<group>"; };
 		2CB1ABE42170214F0060BB78 /* CardStackAnimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardStackAnimator.swift; sourceTree = "<group>"; };
@@ -284,7 +282,6 @@
 				2C88271D21657C7E007DC1DB /* Photo.swift */,
 				2C6526B12126150C006EF3BA /* PSMessage.swift */,
 				2C6526AD21260B54006EF3BA /* NetworkConnection.swift */,
-				2C88273F2165D4E8007DC1DB /* UserSettings.swift */,
 				2C1B6A382171C610006D9050 /* PhotoAlbum.swift */,
 			);
 			path = Models;
@@ -392,7 +389,6 @@
 			files = (
 				2CB1AC2E21702CA10060BB78 /* ManageModeSwipeCard.swift in Sources */,
 				2C6526B22126150C006EF3BA /* PSMessage.swift in Sources */,
-				2C8827402165D4E8007DC1DB /* UserSettings.swift in Sources */,
 				2CB1ABF62170214F0060BB78 /* MGCardStackViewOptions.swift in Sources */,
 				2CB1ABF52170214F0060BB78 /* MGCardStackViewDelegate.swift in Sources */,
 				2CB1ABFA2170214F0060BB78 /* SwipeDirection.swift in Sources */,

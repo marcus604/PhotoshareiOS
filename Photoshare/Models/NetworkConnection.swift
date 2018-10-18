@@ -16,8 +16,6 @@ class NetworkConnection {
     
     private var isConfigured: Bool?
     
-    
-    
     private let bufferSize = 16384
     private let timeout = 10000
     
@@ -35,10 +33,8 @@ class NetworkConnection {
     
     private var currentlyReceiving = false
     
-    private let INSTRUCTION_SYNC = 1
-    private let INSTRUCTION_CREATE_ALBUM = 40
-    private let INSTRUCTION_ADD_TO_ALBUM = 45
-    private let INSTRUCTION_DELETE = 50
+    private var instructions = Instructions()
+    
     
    
     
@@ -54,32 +50,22 @@ class NetworkConnection {
         socket.readBufferSize = bufferSize
     }
     
-    
+    //Create config for TLS
+    //Attempt to make TCP and TLS handshake
     public func start() throws{
         
         //Allows self signed certificates
         var sslConfiguration = SSLService.Configuration(withCipherSuite: nil, clientAllowsSelfSignedCertificates: allowSelfSignedCerts!)
         sslConfiguration.cipherSuite = "ALL"
-        
-       
         do {
             let sslService = try SSLService(usingConfiguration: sslConfiguration)
             socket.delegate = sslService
             sslService?.verifyCallback = { _ in
                 return (true, nil)
             }
-            
-            
             let timeout = UInt(max(0, self.timeout))
-            //try socket.connect(to: hostName!, port: Int32(port!), timeout: timeout)
             try socket.connect(to: hostName!, port: Int32(port!))
             try socket.setReadTimeout(value: timeout)
-            if socket.remoteHostname != hostName {
-                print("man in the middle")
-            }
-            
-        
-            
         } catch {
             guard let socketError = error as? Socket.Error else {
                 throw error
@@ -89,12 +75,18 @@ class NetworkConnection {
         
     }
     
+    //Close connection
+    public func stop() {
+        connected = false
+        socket.close()
+    }
+    
     public func isConnected() -> Bool{
         return connected
     }
     
     public func getImage(withHash hash: String) throws -> UIImage {
-        let requestImgMsg = PSMessage(endian: endian, version: version, instruction: 10, data: hash, token: token)
+        let requestImgMsg = PSMessage(endian: endian, version: version, instruction: instructions.PHOTO_REQUEST, data: hash, token: token)
         
         var image = UIImage()
         do {
@@ -118,13 +110,13 @@ class NetworkConnection {
     }
     
     public func updateImage(withHash hash: String, data: Data) -> Int {
-        let updateImageMsg = PSMessage(endian: endian, version: version, instruction: 30, data: hash, token: token)
+        let updateImageMsg = PSMessage(endian: endian, version: version, instruction: instructions.PHOTO_EDIT, data: hash, token: token)
         var result: Int?
         do {
             try send(msg: updateImageMsg)
             
             let imageSize = data.count
-            let imageSizeMsg = PSMessage(endian: endian, version: version, instruction: 31, data: "\(imageSize)", token: token)
+            let imageSizeMsg = PSMessage(endian: endian, version: version, instruction: instructions.PHOTO_EDIT, data: "\(imageSize)", token: token)
             try send(msg: imageSizeMsg)
             try socket.write(from: data)
             try socket.setReadTimeout(value: 20000)     //Gives 20 seconds to send entire photo
@@ -139,14 +131,14 @@ class NetworkConnection {
     
     public func sendPhoto(fileName name: String, timeStamp: String, data: Data) -> Int {
         
-        let sendPhotoMsg = PSMessage(endian: endian, version: version, instruction: 20, data: name, token: token)
-        let timeStampMsg = PSMessage(endian: endian, version: version, instruction: 20, data: timeStamp, token: token)
+        let sendPhotoMsg = PSMessage(endian: endian, version: version, instruction: instructions.PHOTO_UPLOAD, data: name, token: token)
+        let timeStampMsg = PSMessage(endian: endian, version: version, instruction: instructions.PHOTO_UPLOAD, data: timeStamp, token: token)
         var result = Int()
         do {
             try send(msg: sendPhotoMsg)
             try send(msg: timeStampMsg)
             let imageSize = data.count
-            let imageSizeMsg = PSMessage(endian: endian, version: version, instruction: 21, data: "\(imageSize)", token: token)
+            let imageSizeMsg = PSMessage(endian: endian, version: version, instruction: instructions.PHOTO_UPLOAD, data: "\(imageSize)", token: token)
             try send(msg: imageSizeMsg)
             try socket.write(from: data)
             try socket.setReadTimeout(value: 20000)     //Gives 20 seconds to send entire photo
@@ -161,10 +153,7 @@ class NetworkConnection {
         
     }
     
-    public func stop() {
-        connected = false
-        socket.close()
-    }
+    
     
     private func getUserSetting(of key: String) -> String{
         return UserDefaults.standard.object(forKey: "\(key)") as? String ?? String()
@@ -177,12 +166,12 @@ class NetworkConnection {
         } else {
             compressionFlag = "0"
         }
-        let syncMsg = PSMessage(endian: endian, version: version, instruction: INSTRUCTION_SYNC, data: compressionFlag, token: token)
+        let syncMsg = PSMessage(endian: endian, version: version, instruction: instructions.SYNC, data: compressionFlag, token: token)
         do {
             try send(msg: syncMsg)
             let numOfPhotosMsg = try receiveMessage()
-            let numOfPhotos = Int(numOfPhotosMsg.getData())
-            for _ in 0..<numOfPhotos!{
+            let numOfPhotos = Int(numOfPhotosMsg.getData()) ?? 0
+            for _ in 0..<numOfPhotos{
                 
                 let sizeOfPhotoMsg = try receiveMessage()
                 let sizeOfPhoto = Int(sizeOfPhotoMsg.getData())
@@ -254,8 +243,8 @@ class NetworkConnection {
     //Provide server with working album
     //Request photo be added to working album
     func add(photo hash: String, toAlbum album: String) -> Bool {
-        let addToAlbumMsg = PSMessage(endian: endian, version: version, instruction: INSTRUCTION_ADD_TO_ALBUM , data: album, token: token)
-        let addPhotoAlbumMsg = PSMessage(endian: endian, version: version, instruction: INSTRUCTION_ADD_TO_ALBUM , data: hash, token: token)
+        let addToAlbumMsg = PSMessage(endian: endian, version: version, instruction: instructions.ADD_TO_ALBUM , data: album, token: token)
+        let addPhotoAlbumMsg = PSMessage(endian: endian, version: version, instruction: instructions.ADD_TO_ALBUM , data: hash, token: token)
         do {
             try send(msg: addToAlbumMsg)
             try send(msg: addPhotoAlbumMsg)
@@ -272,9 +261,9 @@ class NetworkConnection {
     }
     
     func createAlbum(album: PSAlbum) -> Bool {
-        let createAlbumMsg = PSMessage(endian: endian, version: version, instruction: INSTRUCTION_CREATE_ALBUM, data: album.title, token: token)
+        let createAlbumMsg = PSMessage(endian: endian, version: version, instruction: instructions.CREATE_ALBUM, data: album.title, token: token)
         let userCreatedString = (album.userCreated ? "1" : "0")
-        let userCreatedMsg = PSMessage(endian: endian, version: version, instruction: INSTRUCTION_CREATE_ALBUM, data: userCreatedString, token: token)
+        let userCreatedMsg = PSMessage(endian: endian, version: version, instruction: instructions.CREATE_ALBUM, data: userCreatedString, token: token)
         do {
             try send(msg: createAlbumMsg)
             try send(msg: userCreatedMsg)
@@ -290,7 +279,7 @@ class NetworkConnection {
     }
     
     func delete(photo hash: String) -> Bool{
-        let deleteMsg = PSMessage(endian: endian, version: version, instruction: INSTRUCTION_DELETE, data: hash, token: token)
+        let deleteMsg = PSMessage(endian: endian, version: version, instruction: instructions.PHOTO_DELETE, data: hash, token: token)
         do {
             try send(msg: deleteMsg)
             try socket.setReadTimeout(value: 10000)
@@ -341,11 +330,11 @@ class NetworkConnection {
     //need to look at socket class and find different method for receiving
     public func receiveImage(ofSize size: Int) throws -> Data{
         do {
-            var readable: Bool = false
+            
             var amountRead = 0
             var image = Data()
             while amountRead < size {
-                try socket.read(into: &image)
+                _ = try socket.read(into: &image)
                 amountRead = image.count
             }
             return image
@@ -365,7 +354,7 @@ class NetworkConnection {
         let data = "\(name):\(pass)"
         let length = data.count
         
-        let handshakeMsg = PSMessage(endian: endian, version: version, instruction: 0, length: length, data: data)
+        let handshakeMsg = PSMessage(endian: endian, version: version, instruction: instructions.HANDSHAKE, length: length, data: data)
         do {
             try send(msg: handshakeMsg)
             let tokenMsg =  try receiveMessage()
@@ -415,4 +404,15 @@ extension Int {
     var boolValue: Bool { return self != 0 }
 }
 
+struct Instructions {
+    let HANDSHAKE = 0
+    let SYNC = 1
+    let PHOTO_REQUEST = 10
+    let PHOTO_UPLOAD = 20
+    let PHOTO_EDIT = 30
+    let CREATE_ALBUM = 40
+    let ADD_TO_ALBUM = 45
+    let PHOTO_DELETE = 50
+    let ERROR = 99
+}
 

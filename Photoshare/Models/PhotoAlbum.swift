@@ -46,23 +46,6 @@ class PSAlbum {
         coverPhoto.loadLocalPhoto()
     }
     
-    //    private func photoExists(photo newPhoto: PSPhoto) -> Bool{
-    //        for photo in photos {
-    //            if newPhoto.photoHash == photo.photoHash{
-    //                os_log(.info, log: OSLog.default, "Photo aleady exists in album")
-    //                return false
-    //            }
-    //        }
-    //        return true
-    //    }
-    
-//    public func add(photo: PSPhoto) -> Bool{
-//        if photoExists(photo: photo){
-//            return false
-//        }
-//        photos.append(photo)
-//        return true
-//    }
-    
+
     
 }

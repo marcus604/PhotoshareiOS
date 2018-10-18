@@ -54,7 +54,7 @@ class PhotoDetailViewController: UIViewController, UIScrollViewDelegate, CropVie
         os_log(.debug, log: OSLog.default, "viewDidLoad: PhotoDetailView")
         assert(photo != nil, "Image not set; required to use view controller")
         imageView.image = photo.localPhoto
-        
+        canRotate()
         //Fullsize photo is available
         guard photo.fullSizePhoto == nil else {
             imageView.image = photo.fullSizePhoto
@@ -135,6 +135,17 @@ class PhotoDetailViewController: UIViewController, UIScrollViewDelegate, CropVie
         super.viewWillAppear(animated)
         os_log(.debug, log: OSLog.default, "viewWillAppear: PhotoDetailView")
         toggleEditView()
+    }
+    
+    @objc func canRotate() -> Void {}
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        if (self.isMovingFromParent) {
+            UIDevice.current.setValue(Int(UIInterfaceOrientation.portrait.rawValue), forKey: "orientation")
+        }
+        
     }
     
     private func toggleEditView() {

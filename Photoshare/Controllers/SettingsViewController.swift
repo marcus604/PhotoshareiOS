@@ -107,9 +107,12 @@ class SettingsViewController: UITableViewController {
         }
     }
     
+   
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         let settings = Photoshare.shared().settings
+        let appDelegate = AppDelegate.appDelegate
         
         imagePicker.delegate = self
             

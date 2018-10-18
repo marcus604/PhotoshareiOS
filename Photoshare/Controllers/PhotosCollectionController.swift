@@ -85,6 +85,7 @@ class PhotosCollectionController: UICollectionViewController {
             if !Photoshare.shared().isConnected {
                 Photoshare.shared().start()
             }
+            Photoshare.shared().sync()
             Photoshare.shared().generatePhotos()
             Photoshare.shared().generateAlbums()
             self.photos = Photoshare.shared().getPhotos()
@@ -106,8 +107,19 @@ class PhotosCollectionController: UICollectionViewController {
         if photos.count == 0 {
             photos = Photoshare.shared().getPhotos()
         }
-        
+        canRotate()
         collectionView?.reloadData()
+    }
+    
+    @objc func canRotate() -> Void {}
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        if (self.isMovingFromParent) {
+            UIDevice.current.setValue(Int(UIInterfaceOrientation.portrait.rawValue), forKey: "orientation")
+        }
+        
     }
     
     private func setupActivityIndicatorView() {

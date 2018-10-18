@@ -136,15 +136,10 @@ class ManageModeViewController: UIViewController, MGCardStackViewDelegate, MGCar
                 
                 let photoToDelete = self.currentPhoto
                 let deletePhotoWorkItem = DispatchWorkItem {
-                    print("STARTING DISPATCH")
-                    print("Interacting with index:  \(currentFullIndex)")
-                    print(photoToDelete!.fileName)
                     if !Photoshare.shared().isConnected {
                         Photoshare.shared().start()
                     }
                     let deleteResult = Photoshare.shared().delete(photo: photoToDelete!, index: currentFullIndex!)
-                    print("TABLE AFTER DELETE")
-                    //Photoshare.shared().formatPhotos()
                     self.deleteWorkStack.complete()
                     
                 }
@@ -208,11 +203,12 @@ class ManageModeViewController: UIViewController, MGCardStackViewDelegate, MGCar
             let okButton = UIAlertAction(title: "OK", style: .default, handler: { action in
                 if let name = requestAlbumAlert.textFields?.first?.text {
                     if !Photoshare.shared().createNewAlbum(withName: name, userCreated: true) {       //Photos generated through UI will always be user created
-                        let alert = UIAlertController(title: "Album already exists", message: "Photo has been added", preferredStyle: .alert)
+                        let alert = UIAlertController(title: "Album already exists", message: "Photo has not been added", preferredStyle: .alert)
                        
                         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                         
                         self.present(alert, animated: true)
+                        return
                     }
                     Photoshare.shared().add(photo: self.currentPhoto, toAlbum: name)
                     Photoshare.shared().generateAlbums()

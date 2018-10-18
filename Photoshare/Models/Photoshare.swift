@@ -204,7 +204,7 @@ class Photoshare {
             photo.fullSizePhoto = photo.localPhoto
             return
         }
-        guard let connected = connection?.isConnected() else {
+        guard (connection?.isConnected()) != nil else {
             self.start()
             return
         }
@@ -217,7 +217,7 @@ class Photoshare {
     }
     
     public func updatePhoto(forPhoto photo: PSPhoto) {
-        guard let connected = connection?.isConnected() else {
+        guard (connection?.isConnected()) != nil else {
             self.start()
             return
         }
@@ -299,13 +299,17 @@ class Photoshare {
         
         let appDelegate = AppDelegate.appDelegate
         let context = appDelegate!.persistentContainer.viewContext
-        let albumEntity = NSEntityDescription.entity(forEntityName: "Albums", in: context)
-        let photoEntity = NSEntityDescription.entity(forEntityName: "Photos", in: context)
+//        let albumEntity = NSEntityDescription.entity(forEntityName: "Albums", in: context)
+//        let photoEntity = NSEntityDescription.entity(forEntityName: "Photos", in: context)
         var fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Albums")
         fetchRequest.fetchLimit = 1
         fetchRequest.predicate = NSPredicate(format: "name == %@", album)
         if let result = try? context.fetch(fetchRequest) {
-            albumObject = result[0] as! NSManagedObject
+            if result.count == 0 {
+                os_log(.info, log: OSLog.default, "Photo could not be added")
+                return false
+            }
+            albumObject = result[0] as? NSManagedObject
         }
         let success = connection?.add(photo: photo.photoHash, toAlbum: album) ?? false
        
@@ -313,7 +317,7 @@ class Photoshare {
         fetchRequest.fetchLimit = 1
         fetchRequest.predicate = NSPredicate(format: "photohash == %@", photo.photoHash)
         if let result = try? context.fetch(fetchRequest) {
-            photoObject = result[0] as! NSManagedObject
+            photoObject = result[0] as? NSManagedObject
         }
         let albumPhotos = albumObject.mutableSetValue(forKey: "photos")
         
@@ -413,7 +417,7 @@ class Photoshare {
     
 
     public func delete(photo: PSPhoto, index: Int) -> Bool{
-        guard let connected = connection?.isConnected() else {
+        guard (connection?.isConnected()) != nil else {
             self.start()
             return false
         }
@@ -435,8 +439,8 @@ class Photoshare {
                 fetchRequest.predicate = NSPredicate(format: "photohash == %@", photo.photoHash)
                 if let result = try? context.fetch(fetchRequest) {
                     let resultData = result[0] as! NSManagedObject
-                    let name = resultData.value(forKey: "fileName") as? String
-                    print("Deleting core data with name: \(name)")
+                    //let name = resultData.value(forKey: "fileName") as? String
+                    //print("Deleting core data with name: \(name)")
                     context.delete(resultData)
                     try fileManager.removeItem(at: fullPath)
                     try fileManager.removeItem(at: thumbnailPath)
@@ -464,7 +468,6 @@ class Photoshare {
         
         let timeStamp = DateFormatter.localizedString(from: asset.creationDate!, dateStyle: DateFormatter.Style.short, timeStyle: DateFormatter.Style.short)
         var name = asset.originalFilename
-        var imageSize = Int()
         let manager = PHImageManager.default()
         let requestOptions = PHImageRequestOptions()
         requestOptions.resizeMode = .exact
@@ -490,10 +493,10 @@ class Photoshare {
             
         }
         
-        imageSize = rawData.count
+       
         
         status = "Uploading Photo"
-        guard let connected = connection?.isConnected() else {
+        guard (connection?.isConnected()) != nil else {
             self.start()
             return
         }
@@ -521,7 +524,7 @@ class Photoshare {
         let settings = settings
         
         
-        compressionEnabled = settings["compressionEnabled"] as! Bool
+        compressionEnabled = settings["compressionEnabled"] as? Bool
         do {
             connection = try NetworkConnection(
                 hostName: settings["hostName"] as! String,
@@ -650,15 +653,6 @@ class Photoshare {
     
    
     
-    private func receive(message msg: PSMessage){
-        
-    }
-    
-    private func send(message msg: PSMessage){
-        
-    }
-    
-
     
     
 }
