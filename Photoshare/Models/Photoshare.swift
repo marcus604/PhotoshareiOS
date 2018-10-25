@@ -183,10 +183,17 @@ class Photoshare {
    
     public func sync() {
         var numOfPhotosSynced = 0
+        //Get most recent photo to determine sync
+        var lastSyncedPhotoHash: String
+        if photos.isEmpty {
+            lastSyncedPhotoHash = "0"
+        } else {
+            lastSyncedPhotoHash = getMostRecentlyAddedPhoto()
+        }
         if isConnected {
             status = "Syncing"
             do {
-                numOfPhotosSynced = try (connection?.sync(compressionEnabled: compressionEnabled ?? true))!
+                numOfPhotosSynced = try (connection?.sync(compressionEnabled: compressionEnabled ?? true, lastSyncedPhotoHash: lastSyncedPhotoHash))!
             } catch {
                 isConnected = false
                 os_log(.error, log: OSLog.default, "Failed Sync")
@@ -199,6 +206,7 @@ class Photoshare {
         
         
     }
+    
     public func getFullSizeImage(forPhoto photo: PSPhoto) {
         if !getUserSetting(asBoolFor: "compressionEnabled") {
             photo.fullSizePhoto = photo.localPhoto
@@ -248,6 +256,30 @@ class Photoshare {
 
     }
     
+    public func generateSmartAlbums() {
+        //Create albums for each year
+        //--- TO DO
+        //--- Inspect Library for what years it has rather than generating and checking
+        //--- Only look at photos that were added since last update
+        let calendar = Calendar.current
+        for photo in self.photos {
+            let photoYear = calendar.component(.year, from: photo.timestamp)
+            var doesAlbumExist = false
+            for album in albums {
+                if album.title == "\(photoYear)" {
+                    doesAlbumExist = true
+                }
+            }
+            if !doesAlbumExist {
+                createNewAlbum(withName: "\(photoYear)", userCreated: false)
+            }
+            add(photo: photo, toAlbum: "\(photoYear)")
+            }
+        
+        
+        
+    }
+    
     
     public func createNewAlbum(withName name: String, userCreated: Bool) -> Bool{
         let appDelegate = AppDelegate.appDelegate
@@ -280,7 +312,8 @@ class Photoshare {
             do {
                 try context.save()
                 os_log(.debug, log: OSLog.default, "Created Album: %@", name)
-                generateAlbums()
+                albums.append(album)
+                //generateAlbums()
                 return true
             } catch {
                 os_log(.error, log: OSLog.default, "Failed to create album")
@@ -369,7 +402,8 @@ class Photoshare {
                     let localPath = getDirectory(withName: "Library/Photos").appendingPathComponent(fileName)
                     let hash = (photoInAlbum.value(forKey: "photohash") as! String)
                     let compressionEnabled = settings["compressionEnabled"] as? Bool
-                    let photo = PSPhoto(fileName: fileName, thumbnailPath: thumbnailPath, localPath: localPath, photoHash: hash, isCompressed: compressionEnabled ?? true)
+                    let timestamp = (photoInAlbum.value(forKey: "timestamp") as! Date)
+                    let photo = PSPhoto(fileName: fileName, thumbnailPath: thumbnailPath, localPath: localPath, photoHash: hash, isCompressed: compressionEnabled ?? true, timestamp: timestamp)
                     photos.append(photo)
                     
                 }
@@ -398,13 +432,36 @@ class Photoshare {
                 let localPath = getDirectory(withName: "Library/Photos").appendingPathComponent(fileName)
                 let hash = (data.value(forKey: "photohash") as! String)
                 let compressionEnabled = settings["compressionEnabled"] as? Bool
-                let photo = PSPhoto(fileName: fileName, thumbnailPath: thumbnailPath, localPath: localPath, photoHash: hash, isCompressed: compressionEnabled ?? true)
+                let timestamp = (data.value(forKey: "timestamp") as! Date)
+                let photo = PSPhoto(fileName: fileName, thumbnailPath: thumbnailPath, localPath: localPath, photoHash: hash, isCompressed: compressionEnabled ?? true, timestamp: timestamp)
                 photos.append(photo)
             }
             os_log(.debug, log: OSLog.default, "Generated %d photos for view", photos.count)
         } catch {
             os_log(.error, log: OSLog.default, "Failed to generate photos")
         }
+    }
+    
+    private func getMostRecentlyAddedPhoto() -> String{
+        let appDelegate = AppDelegate.appDelegate
+        let context = appDelegate!.persistentContainer.viewContext
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Photos")
+        let sortDescriptor = NSSortDescriptor(key: "dateAdded", ascending: false)
+        request.fetchLimit = 1
+        request.sortDescriptors = [sortDescriptor]
+        var hash: String
+        do {
+            let result = try context.fetch(request)
+            for data in result as! [NSManagedObject] {
+                hash = (data.value(forKey: "photohash") as! String)
+                os_log(.debug, log: OSLog.default, "Most Recent photo hash: %@", hash)
+                return hash
+            }
+        } catch {
+            os_log(.error, log: OSLog.default, "Failed to grab most recent photo")
+            
+        }
+        return ""
     }
     
     public func formatPhotos() {

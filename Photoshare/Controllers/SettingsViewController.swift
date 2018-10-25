@@ -32,6 +32,10 @@ class SettingsViewController: UITableViewController {
     
     var imagePicker = UIImagePickerController()
     
+    @IBAction func updateSmartAlbums(_ sender: UIButton) {
+        Photoshare.shared().generateSmartAlbums()
+        
+    }
     @IBAction func importButton(_ sender: UIButton) {
         PHPhotoLibrary.requestAuthorization({
             (newStatus) in

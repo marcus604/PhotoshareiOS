@@ -159,7 +159,7 @@ class NetworkConnection {
         return UserDefaults.standard.object(forKey: "\(key)") as? String ?? String()
     }
     
-    public func sync(compressionEnabled: Bool) throws -> Int{
+    public func sync(compressionEnabled: Bool, lastSyncedPhotoHash: String) throws -> Int{
         var compressionFlag: String
         if compressionEnabled {
             compressionFlag = "1"
@@ -167,8 +167,10 @@ class NetworkConnection {
             compressionFlag = "0"
         }
         let syncMsg = PSMessage(endian: endian, version: version, instruction: instructions.SYNC, data: compressionFlag, token: token)
+        let lastSyncedPhotoMsg = PSMessage(endian: endian, version: version, instruction: instructions.SYNC, data: lastSyncedPhotoHash, token: token)
         do {
             try send(msg: syncMsg)
+            try send(msg: lastSyncedPhotoMsg)
             let numOfPhotosMsg = try receiveMessage()
             let numOfPhotos = Int(numOfPhotosMsg.getData()) ?? 0
             for _ in 0..<numOfPhotos{
@@ -187,6 +189,7 @@ class NetworkConnection {
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateFormat = "yyyy':'MM':'dd' 'HH':'mm':'ss"
                 let timeStampOfPhoto = dateFormatter.date(from: timeStampString)
+                let currentTime = Date()
                 
                 let image = try receiveImage(ofSize: sizeOfPhoto!)
                 
@@ -208,6 +211,7 @@ class NetworkConnection {
                     newPhoto.setValue(photoName, forKey: "fileName")
                     newPhoto.setValue(hashOfPhoto, forKey: "photohash")
                     newPhoto.setValue(timeStampOfPhoto, forKey: "timestamp")
+                    newPhoto.setValue(currentTime, forKey: "dateAdded")
                     do {
                         try context.save()
                     } catch {

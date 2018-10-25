@@ -21,15 +21,17 @@ class PSPhoto {
     public var fileName : String
     public var photoHash : String
     public var isCompressed : Bool
+    public var timestamp : Date
     
     
     
-    init (fileName : String, thumbnailPath : URL, localPath : URL, photoHash : String, isCompressed: Bool) {
+    init (fileName : String, thumbnailPath : URL, localPath : URL, photoHash : String, isCompressed: Bool, timestamp: Date) {
         self.fileName = fileName
         self.localPath = localPath
         self.photoHash = photoHash
         self.thumbnailPath = thumbnailPath
         self.isCompressed = isCompressed
+        self.timestamp = timestamp
     }
     
    

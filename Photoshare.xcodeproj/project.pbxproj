@@ -28,6 +28,7 @@
 		2C88271C21657B0B007DC1DB /* PhotoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C88271B21657B0B007DC1DB /* PhotoCell.swift */; };
 		2C88271E21657C7E007DC1DB /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C88271D21657C7E007DC1DB /* Photo.swift */; };
 		2C88273E2165C572007DC1DB /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C88273D2165C572007DC1DB /* SettingsViewController.swift */; };
+		2C908CBF2181A065002B9276 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C908CBE2181A065002B9276 /* Extensions.swift */; };
 		2CA2FACC216F250B003D4058 /* PhotoCropEditor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CA2FACB216F250B003D4058 /* PhotoCropEditor.framework */; };
 		2CA2FACE216F2528003D4058 /* PhotoCropEditor.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2CA2FACD216F2528003D4058 /* PhotoCropEditor.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2CB1ABF42170214F0060BB78 /* CardStackAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CB1ABE42170214F0060BB78 /* CardStackAnimator.swift */; };
@@ -90,6 +91,7 @@
 		2C88271B21657B0B007DC1DB /* PhotoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCell.swift; sourceTree = "<group>"; };
 		2C88271D21657C7E007DC1DB /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
 		2C88273D2165C572007DC1DB /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		2C908CBE2181A065002B9276 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		2CA2FACB216F250B003D4058 /* PhotoCropEditor.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhotoCropEditor.framework; path = Carthage/Build/iOS/PhotoCropEditor.framework; sourceTree = "<group>"; };
 		2CA2FACD216F2528003D4058 /* PhotoCropEditor.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhotoCropEditor.framework; path = Carthage/Build/iOS/PhotoCropEditor.framework; sourceTree = "<group>"; };
 		2CB1ABE42170214F0060BB78 /* CardStackAnimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardStackAnimator.swift; sourceTree = "<group>"; };
@@ -283,6 +285,7 @@
 				2C6526B12126150C006EF3BA /* PSMessage.swift */,
 				2C6526AD21260B54006EF3BA /* NetworkConnection.swift */,
 				2C1B6A382171C610006D9050 /* PhotoAlbum.swift */,
+				2C908CBE2181A065002B9276 /* Extensions.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -394,6 +397,7 @@
 				2CB1ABFA2170214F0060BB78 /* SwipeDirection.swift in Sources */,
 				2C590ED82172F984001684B5 /* AlbumCell.swift in Sources */,
 				2CB1ABFE2170214F0060BB78 /* UIView+Anchor.swift in Sources */,
+				2C908CBF2181A065002B9276 /* Extensions.swift in Sources */,
 				2CB1ABFB2170214F0060BB78 /* MGSwipeView.swift in Sources */,
 				2C6526AE21260B54006EF3BA /* NetworkConnection.swift in Sources */,
 				2CB1ABFD2170214F0060BB78 /* Array+Shift.swift in Sources */,

@@ -68,7 +68,7 @@
         <!--Photo Detail View Controller-->
         <scene sceneID="4Sr-o5-Y3G">
             <objects>
-                <viewController storyboardIdentifier="PhotoDetailStoryboard" id="0aJ-XH-vmm" customClass="PhotoDetailViewController" customModule="Photoshare" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="PhotoDetailStoryboard" automaticallyAdjustsScrollViewInsets="NO" id="0aJ-XH-vmm" customClass="PhotoDetailViewController" customModule="Photoshare" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="lT5-Pr-Ayf">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -76,8 +76,8 @@
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zUI-Lg-xQL">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                                 <subviews>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ugd-BN-wgE">
-                                        <rect key="frame" x="0.0" y="-64" width="414" height="736"/>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="100" placeholderIntrinsicHeight="100" translatesAutoresizingMaskIntoConstraints="NO" id="Ugd-BN-wgE">
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                                     </imageView>
                                 </subviews>
                                 <constraints>
@@ -86,7 +86,7 @@
                                     <constraint firstItem="Ugd-BN-wgE" firstAttribute="centerX" secondItem="zUI-Lg-xQL" secondAttribute="centerX" id="Nfy-Nw-USm"/>
                                     <constraint firstItem="Ugd-BN-wgE" firstAttribute="centerY" secondItem="zUI-Lg-xQL" secondAttribute="centerY" id="azS-Yv-S6Q"/>
                                     <constraint firstItem="Ugd-BN-wgE" firstAttribute="leading" secondItem="zUI-Lg-xQL" secondAttribute="leading" id="irF-pd-wrR"/>
-                                    <constraint firstAttribute="trailing" secondItem="Ugd-BN-wgE" secondAttribute="trailing" id="se6-31-zJR"/>
+                                    <constraint firstItem="Ugd-BN-wgE" firstAttribute="trailing" secondItem="zUI-Lg-xQL" secondAttribute="trailing" id="se6-31-zJR"/>
                                 </constraints>
                                 <connections>
                                     <outlet property="delegate" destination="0aJ-XH-vmm" id="Rnd-2o-juZ"/>
@@ -96,7 +96,7 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <gestureRecognizers/>
                         <constraints>
-                            <constraint firstItem="zUI-Lg-xQL" firstAttribute="top" secondItem="lT5-Pr-Ayf" secondAttribute="top" id="23n-cp-fZ1"/>
+                            <constraint firstAttribute="top" secondItem="zUI-Lg-xQL" secondAttribute="top" id="23n-cp-fZ1"/>
                             <constraint firstItem="zUI-Lg-xQL" firstAttribute="bottom" secondItem="lT5-Pr-Ayf" secondAttribute="bottom" id="6Vp-Le-rsM"/>
                             <constraint firstItem="zUI-Lg-xQL" firstAttribute="leading" secondItem="lT5-Pr-Ayf" secondAttribute="leading" id="W3l-ZO-KVh"/>
                             <constraint firstAttribute="trailing" secondItem="zUI-Lg-xQL" secondAttribute="trailing" id="tEa-lE-sgZ"/>
@@ -415,6 +415,34 @@
                                             <constraints>
                                                 <constraint firstItem="zrD-Pk-BX9" firstAttribute="centerX" secondItem="l8i-Fi-fva" secondAttribute="centerX" id="3Jz-6s-zKA"/>
                                                 <constraint firstItem="zrD-Pk-BX9" firstAttribute="centerY" secondItem="l8i-Fi-fva" secondAttribute="centerY" id="InD-jT-uzd"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="q1L-iU-qXT">
+                                        <rect key="frame" x="0.0" y="464" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="q1L-iU-qXT" id="Jdw-rU-WlH">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.666666666666664"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" textAlignment="right" adjustsFontForContentSizeCategory="YES" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="bv5-eo-DZY">
+                                                    <rect key="frame" x="216" y="0.0" width="159" height="44"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <nil key="textColor"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                    <textInputTraits key="textInputTraits"/>
+                                                </textField>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="H5w-WH-gFU">
+                                                    <rect key="frame" x="131.66666666666666" y="7" width="150.99999999999997" height="30"/>
+                                                    <state key="normal" title="Update Smart Albums"/>
+                                                    <connections>
+                                                        <action selector="updateSmartAlbums:" destination="9oF-97-s4S" eventType="touchUpInside" id="arG-nS-myg"/>
+                                                    </connections>
+                                                </button>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="H5w-WH-gFU" firstAttribute="centerY" secondItem="Jdw-rU-WlH" secondAttribute="centerY" id="a0R-zD-reo"/>
+                                                <constraint firstItem="H5w-WH-gFU" firstAttribute="centerX" secondItem="Jdw-rU-WlH" secondAttribute="centerX" id="tgH-VD-WKX"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
