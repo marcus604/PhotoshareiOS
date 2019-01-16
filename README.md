@@ -11,23 +11,23 @@ Allows for compressed versions of photos to be stored locally while seamlessy gr
 
 Photos are shown in chronological order.
 
-![](Default View Demo.gif)
+![](Default-View-Demo.gif)
 
 ## Manage Mode
 
 Displays photos in card fashion and allows user to easily swipe in different directions to perform different actions such as delete, or add to album.
 
-![](Manage Demo.gif)
+![](Manage-Demo.gif)
 
 ## Editing
 
 Photos can be cropped and rotated. These edits are then pushed back to the server.
 
-![](Crop Demo.gif)
+![](Crop-Demo.gif)
 
 ## Album View
 
-![](Album Demo.gif)
+![](Album-Demo.gif)
 
 
 
